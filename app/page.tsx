@@ -1,20 +1,12 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import Layout from '@/components/layout';
-import styles from '@/styles/Home.module.css';
 import ReactMarkdown from 'react-markdown';
 import { ReloadIcon } from '@radix-ui/react-icons';
 import { Document } from 'langchain/document';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { SendHorizonalIcon, SendIcon } from 'lucide-react';
+import { SendHorizonalIcon } from 'lucide-react';
 
 type Message = {
   type: 'apiMessage' | 'userMessage';
@@ -80,7 +72,6 @@ export default function Home() {
         }),
       });
       const data = await response.json();
-      console.log('data', data);
 
       if (data.error) {
         setError(data.error);
@@ -98,7 +89,6 @@ export default function Home() {
           history: [...state.history, [question, data.text]],
         }));
       }
-      console.log('messageState', messageState);
 
       setLoading(false);
 
@@ -107,60 +97,56 @@ export default function Home() {
     } catch (error) {
       setLoading(false);
       setError('An error occurred while fetching the data. Please try again.');
-      console.log('error', error);
     }
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center">
-      <div className="mx-auto flex flex-col gap-4">
-        <h1 className="text-2xl font-bold leading-[1.1] tracking-tighter text-center">
-          Ask questions about the document and wait response of LLM Model
-        </h1>
-        <div className="w-[75vw] h-[65vh] bg-white rounded-md border border-[#d9d9e3]">
-          <div ref={messageListRef} className="flex flex-col gap-3 p-6">
-            {messages.map((message, index) => {
-              return (
-                <div
-                  key={`chatMessage-${index}`}
-                  className={`bg-gray-100 rounded-md p-3 ${
-                    message.type === 'apiMessage'
-                      ? 'text-red-500'
-                      : 'text-blue-500'
-                  }`}
-                >
-                  <ReactMarkdown>{message.message}</ReactMarkdown>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        <form className="w-full flex gap-3" onSubmit={handleSubmit}>
-          <Input
-            disabled={loading}
-            className="w-full"
-            ref={textAreaRef}
-            autoFocus={false}
-            maxLength={512}
-            id="userInput"
-            name="userInput"
-            placeholder={
-              loading
-                ? 'Waiting for response...'
-                : 'What is this legal case about?'
-            }
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-          />
-          <Button type="submit" disabled={loading}>
-            {loading ? (
-              <ReloadIcon className="h-4 w-4 animate-spin" />
-            ) : (
-              <SendHorizonalIcon className=" h-4 w-4" />
-            )}
-          </Button>
-        </form>
+    <main className="min-h-screen flex flex-col px-3 2xl:px-96 gap-6 py-6 items-center justify-center">
+      <h1 className="text-2xl font-bold leading-[1.1] tracking-tighter text-center">
+        Chat AI
+      </h1>
+      <div
+        ref={messageListRef}
+        className="flex grow w-full h-full flex-col border-gray-300 border gap-3 p-6"
+      >
+        {messages.map((message, index) => {
+          return (
+            <div
+              key={`chatMessage-${index}`}
+              className={`bg-gray-100 rounded-md p-3 ${
+                message.type === 'apiMessage' ? 'text-red-500' : 'text-blue-500'
+              }`}
+            >
+              <ReactMarkdown>{message.message}</ReactMarkdown>
+            </div>
+          );
+        })}
       </div>
+      <form className="w-full flex gap-3" onSubmit={handleSubmit}>
+        <Input
+          disabled={loading}
+          className="w-full"
+          ref={textAreaRef}
+          autoFocus={false}
+          maxLength={512}
+          id="userInput"
+          name="userInput"
+          placeholder={
+            loading
+              ? 'Waiting for response...'
+              : 'What is this legal case about?'
+          }
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+        />
+        <Button type="submit" disabled={loading}>
+          {loading ? (
+            <ReloadIcon className="h-4 w-4 animate-spin" />
+          ) : (
+            <SendHorizonalIcon className=" h-4 w-4" />
+          )}
+        </Button>
+      </form>
       {error && (
         <div className="border border-red-400 rounded-md p-4">
           <p className="text-red-500">{error}</p>
