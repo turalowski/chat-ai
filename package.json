@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@langchain/openai": "^0.0.14",
+    "@langchain/pinecone": "^0.0.3",
     "@pinecone-database/pinecone": "^2.0.1",
     "langchain": "^0.1.17",
     "next": "14.1.0",
