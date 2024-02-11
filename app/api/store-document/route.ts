@@ -53,14 +53,10 @@ export async function POST(request: NextRequest) {
 
     /* Returning the processed document chunks in JSON format */
     return Response.json({ message: 'Success', documentChunks });
-  } catch (error) {
+  } catch (error: any) {
     /* Handling errors during document processing */
-    if (error instanceof Error) {
-      return new Response(`Storing document error: ${error.message}`, {
-        status: 400,
-      });
-    }
-    /* Generic error handling if error is not an instance of Error */
-    return new Response('An unexpected error occurred', { status: 500 });
+    return new Response(`Storing document error: ${error.message}`, {
+      status: 400,
+    });
   }
 }
