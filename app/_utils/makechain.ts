@@ -43,7 +43,7 @@ export const makeChain = (retriever: VectorStoreRetriever) => {
   /* Initialize the chat model with specific parameters. */
   const model = new ChatOpenAI({
     temperature: 0 /* increase temperature to get more creative answers */,
-    modelName: 'gpt-3.5-turbo' /* change this to gpt-4 if you have access */,
+    modelName: 'gpt-4' /* change this to gpt-4 if you have access */,
   });
 
   /* Create a sequence to rephrase the question based on chat history. */
