@@ -6,7 +6,14 @@ import { ReloadIcon } from '@radix-ui/react-icons';
 import { Document } from 'langchain/document';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { SendHorizonalIcon } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 type Message = {
   type: 'apiMessage' | 'userMessage';
@@ -34,12 +41,12 @@ export default function Home() {
   const messageListRef = useRef<HTMLDivElement>(null);
   const textAreaRef = useRef<HTMLInputElement>(null);
 
-  async function handleSubmit(e: any) {
+  async function handleSubmit(e: any, manual?: string) {
     e.preventDefault();
 
     setError(null);
 
-    if (!query) {
+    if (!query && !manual) {
       alert('Please input a question');
       return;
     }
@@ -52,7 +59,7 @@ export default function Home() {
         ...state.messages,
         {
           type: 'userMessage',
-          message: question,
+          message: manual || question,
         },
       ],
     }));
@@ -67,7 +74,7 @@ export default function Home() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          question,
+          question: question || manual,
           history,
         }),
       });
@@ -113,15 +120,46 @@ export default function Home() {
           return (
             <div
               key={`chatMessage-${index}`}
-              className={`bg-gray-100 rounded-md p-3 ${
-                message.type === 'apiMessage' ? 'text-red-500' : 'text-blue-500'
-              }`}
+              className={`border border-gray-200 rounded-md p-3`}
             >
+              <div className="flex items-center gap-3">
+                <Avatar className="w-8 h-8">
+                  <AvatarImage className="w-2 h-2" alt="@shadcn" />
+                  <AvatarFallback className="text-sm">
+                    {message.type === 'apiMessage' ? 'AI' : 'ME'}
+                  </AvatarFallback>
+                </Avatar>
+                <p className="text-md font-bold">
+                  {message.type === 'apiMessage' ? 'AI' : 'ME'}
+                </p>
+              </div>
               <ReactMarkdown>{message.message}</ReactMarkdown>
             </div>
           );
         })}
       </div>
+      <div className="flex  w-full flex-wrap items-start">
+        <Card
+          className="hover:bg-gray-100 hover:cursor-pointer"
+          onClick={event => {
+            handleSubmit(
+              event,
+              'What is the primary content or purpose of this file?'
+            );
+          }}
+        >
+          <CardHeader className="p-2">
+            <CardTitle className="text-md">
+              What is the primary content or purpose of this file?
+            </CardTitle>
+            <CardDescription>
+              This question aims to understand the main content or goal
+              associated with the file.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+
       <form className="w-full flex gap-3" onSubmit={handleSubmit}>
         <Input
           disabled={loading}
