@@ -114,7 +114,7 @@ export default function Home() {
       </h1>
       <div
         ref={messageListRef}
-        className="flex grow w-full h-full flex-col border-gray-300 border gap-3 p-6"
+        className="flex grow w-full h-full flex-col border-gray-300 border gap-3 p-6 overflow-scroll"
       >
         {messages.map((message, index) => {
           return (
