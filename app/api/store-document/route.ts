@@ -11,7 +11,7 @@ const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME as string;
 
 /* Function to handle POST request for document processing */
 export async function POST(request: NextRequest) {
-  throw new Error('This endpoint is close for usage');
+  throw new Error('This API is close for usage');
   try {
     /* Extracting file from the request's form data */
     const formData = await request.formData();

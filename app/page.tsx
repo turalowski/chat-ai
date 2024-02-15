@@ -138,24 +138,34 @@ export default function Home() {
           );
         })}
       </div>
-      <div className="flex  w-full flex-wrap items-start">
+      <div className="grid md:grid-cols-2 gap-6 w-full flex-wrap items-start">
+        <Card
+          className="hover:bg-gray-100 hover:cursor-pointer"
+          onClick={event => {
+            handleSubmit(event, 'Identify all the metrics and their values.');
+          }}
+        >
+          <CardHeader className="p-2">
+            <CardTitle className="text-md">
+              Identify all the metrics and their values.
+            </CardTitle>
+            <CardDescription>Description for the question</CardDescription>
+          </CardHeader>
+        </Card>
         <Card
           className="hover:bg-gray-100 hover:cursor-pointer"
           onClick={event => {
             handleSubmit(
               event,
-              'What is the primary content or purpose of this file?'
+              'Identify any inconsistency in the values of the metrics.'
             );
           }}
         >
           <CardHeader className="p-2">
             <CardTitle className="text-md">
-              What is the primary content or purpose of this file?
+              Identify any inconsistency in the values of the metrics.
             </CardTitle>
-            <CardDescription>
-              This question aims to understand the main content or goal
-              associated with the file.
-            </CardDescription>
+            <CardDescription>Description for the question</CardDescription>
           </CardHeader>
         </Card>
       </div>
