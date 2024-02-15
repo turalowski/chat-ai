@@ -18,8 +18,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 type Message = {
   type: 'apiMessage' | 'userMessage';
   message: string;
-  isStreaming?: boolean;
-  sourceDocs?: Document[];
 };
 
 export default function Home() {
@@ -108,13 +106,13 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col px-3 2xl:px-96 gap-6 py-6 items-center justify-center">
+    <main className="h-screen flex flex-col px-3 2xl:px-96 gap-6 py-6 items-center justify-center">
       <h1 className="text-2xl font-bold leading-[1.1] tracking-tighter text-center">
         Chat AI
       </h1>
       <div
         ref={messageListRef}
-        className="flex grow w-full h-full flex-col border-gray-300 border gap-3 p-6 overflow-scroll"
+        className="flex grow w-full flex-col border-gray-300 border gap-3 p-6 overflow-scroll"
       >
         {messages.map((message, index) => {
           return (
