@@ -4,19 +4,11 @@ import { PineconeStore } from '@langchain/pinecone';
 import { makeChain } from '@/app/_utils/makechain';
 import { pinecone } from '@/app/_utils/pinecone-client';
 
-let MAX_LIMIT = 20;
-let current_limit = 0;
-
 /* Retrieve Pinecone configurations from environment variables */
 const PINECONE_NAME_SPACE = process.env.PINECONE_NAME_SPACE as string;
 const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME as string;
 
 export async function POST(req: Request) {
-  current_limit += 1;
-
-  if (current_limit > MAX_LIMIT) {
-    throw new Error('Max limit reached');
-  }
   /* Parse the request body to extract the question and history */
   const { question, history } = await req.json();
   try {
