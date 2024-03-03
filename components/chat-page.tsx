@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/card';
 import { SendHorizonalIcon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { logout } from '@/app/(auth)/actions';
 
 type Message = {
   type: 'apiMessage' | 'userMessage';
@@ -107,9 +108,18 @@ export default function ChatPage() {
 
   return (
     <main className="h-screen flex flex-col px-3 2xl:px-96 gap-6 py-6 items-center justify-center">
-      <h1 className="text-2xl font-bold leading-[1.1] tracking-tighter text-center">
-        Chat AI
-      </h1>
+      <div className="flex items-center gap-12">
+        <h1 className="text-2xl font-bold leading-[1.1] tracking-tighter text-center">
+          Chat AI
+        </h1>
+        <Button
+          onClick={() => {
+            logout();
+          }}
+        >
+          Logout
+        </Button>
+      </div>
       <div
         ref={messageListRef}
         className="flex grow w-full flex-col border-gray-300 border gap-3 p-6 overflow-scroll"
