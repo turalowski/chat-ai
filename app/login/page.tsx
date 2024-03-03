@@ -12,13 +12,14 @@ export default function Login() {
   const supabase = createClientComponentClient<Database>();
 
   const handleSignUp = async () => {
-    await supabase.auth.signUp({
+    const response = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${location.origin}/auth/callback`,
+        emailRedirectTo: `${location.origin}/api/auth/callback`,
       },
     });
+    console.log(response);
     router.refresh();
   };
 
