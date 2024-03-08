@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const Messages: {
   [key: string]: string;
@@ -24,7 +24,7 @@ const Messages: {
 } as const;
 
 const formSchema = z.object({
-  email: z.string().min(2).max(50),
+  email: z.string().email(),
   password: z.string().min(2).max(50),
 });
 
@@ -38,6 +38,7 @@ export function AuthForm({
   const router = useRouter();
   const searchParams = useSearchParams();
   const status = searchParams.get('status') as string;
+  const message = searchParams.get('message') as string;
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -114,9 +115,9 @@ export function AuthForm({
             {submitButtonLabel === 'Login' ? 'Sign up' : 'Login'}
           </Button>
         </div>
-        {status && (
+        {message && (
           <Alert variant="default">
-            <AlertDescription>{Messages[status]}</AlertDescription>
+            {message && <AlertDescription>{message}</AlertDescription>}
           </Alert>
         )}
       </nav>
