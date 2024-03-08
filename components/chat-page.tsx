@@ -150,7 +150,6 @@ export default function ChatPage() {
         <div className="flex gap-3">
           <Input
             id="file"
-            value={file}
             type="file"
             accept="application/pdf"
             onChange={event => {
