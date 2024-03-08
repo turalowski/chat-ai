@@ -11,7 +11,6 @@ const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME as string;
 
 /* Function to handle POST request for document processing */
 export async function POST(request: NextRequest) {
-  throw new Error('This API is close for usage');
   try {
     /* Extracting file from the request's form data */
     const formData = await request.formData();
@@ -52,7 +51,7 @@ export async function POST(request: NextRequest) {
     });
 
     /* Returning the processed document chunks in JSON format */
-    return Response.json({ message: 'Success', documentChunks });
+    return Response.json({ message: 'Success', success: true, documentChunks });
   } catch (error: any) {
     /* Handling errors during document processing */
     return new Response(`Storing document error: ${error.message}`, {

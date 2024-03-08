@@ -15,6 +15,7 @@ import {
 import { SendHorizonalIcon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { logout } from '@/app/(auth)/actions';
+import { toast } from './ui/use-toast';
 
 type Message = {
   type: 'apiMessage' | 'userMessage';
@@ -25,6 +26,7 @@ export default function ChatPage() {
   const [query, setQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [messageState, setMessageState] = useState<{
     messages: Message[];
     pending?: string;
@@ -39,6 +41,39 @@ export default function ChatPage() {
 
   const messageListRef = useRef<HTMLDivElement>(null);
   const textAreaRef = useRef<HTMLInputElement>(null);
+
+  async function handleUploadClick() {
+    try {
+      const request = await fetch(`/api/pinecone/vectors`, {
+        method: 'DELETE',
+      });
+      console.log(request);
+      if (request.ok) {
+        const formData = new FormData();
+        if (file) {
+          formData.append('file', file);
+          const request = await fetch('/api/store-document', {
+            method: 'POST',
+            body: formData,
+          });
+          console.log('request', request)
+          if (request.ok) {
+            toast({
+              title: 'File has been uploaded',
+            });
+          } else {
+            throw new Error('Failed to upload the file.');
+          }
+        }
+      } else {
+        throw new Error('Failed to clear vectorial database');
+      }
+    } catch (error: any) {
+      toast({
+        title: error.message,
+      });
+    }
+  }
 
   async function handleSubmit(e: any, manual?: string) {
     e.preventDefault();
@@ -108,10 +143,27 @@ export default function ChatPage() {
 
   return (
     <main className="h-screen flex flex-col px-3 2xl:px-96 gap-6 py-6 items-center justify-center">
-      <div className="flex items-center gap-12">
-        <h1 className="text-2xl font-bold leading-[1.1] tracking-tighter text-center">
+      <div className="flex items-center w-full gap-12 justify-between">
+        <h1 className="hidden md:block text-2xl font-bold leading-[1.1] tracking-tighter text-center">
           Chat AI
         </h1>
+        <div className="flex gap-3">
+          <Input
+            id="file"
+            value={file}
+            type="file"
+            accept="application/pdf"
+            onChange={event => {
+              const file = event?.target?.files?.[0];
+              if (file) {
+                setFile(file);
+              }
+            }}
+          />
+          <Button disabled={!file} onClick={handleUploadClick}>
+            Upload
+          </Button>
+        </div>
         <Button
           onClick={() => {
             logout();
