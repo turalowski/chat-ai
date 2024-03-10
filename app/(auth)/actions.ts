@@ -15,8 +15,6 @@ export async function login(email: string, password: string) {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    console.log('/login message', error.message);
-    console.log('/login cause', error.cause);
     redirect(`/login?status=${error.name}&message=${error.message}`);
   } else {
     revalidatePath('/');
@@ -32,7 +30,10 @@ export async function signup(email: string, password: string,) {
 
   const response = await supabase.auth.signUp({
     email,
-    password,
+    password, 
+    options: {
+      emailRedirectTo: `${getURL()}/api/auth/confirm`
+    }
   },);
 
   if (response.data && response.data.user) {
