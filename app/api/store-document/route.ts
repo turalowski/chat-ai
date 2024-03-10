@@ -4,14 +4,23 @@ import { PineconeStore } from '@langchain/pinecone';
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
 import { pinecone } from '@/app/_utils/pinecone-client';
 import { NextRequest } from 'next/server';
+import { createClient } from '@/app/_utils/supabase/server';
+
 
 /* Environment variables for Pinecone configuration */
 const PINECONE_NAME_SPACE = process.env.PINECONE_NAME_SPACE as string;
 const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME as string;
+const ALLOWLIST = process.env.ALLOWLIST as string;
 
 /* Function to handle POST request for document processing */
 export async function POST(request: NextRequest) {
-  throw new Error('This API is close for usage');
+  const supabase = createClient();
+  const { data } = await supabase.auth.getUser();
+  if(!data.user?.email || !ALLOWLIST.includes(data?.user?.email)) {
+    return new Response("You don't have a permission to use this endpoint", {
+      status: 400,
+    });
+  }
   try {
     /* Extracting file from the request's form data */
     const formData = await request.formData();
@@ -52,7 +61,7 @@ export async function POST(request: NextRequest) {
     });
 
     /* Returning the processed document chunks in JSON format */
-    return Response.json({ message: 'Success', documentChunks });
+    return Response.json({ message: 'Success', success: true, documentChunks });
   } catch (error: any) {
     /* Handling errors during document processing */
     return new Response(`Storing document error: ${error.message}`, {
