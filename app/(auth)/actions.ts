@@ -24,7 +24,7 @@ export async function login(email: string, password: string) {
   }
 }
 
-export async function signup(email: string, password: string) {
+export async function signup(email: string, password: string,) {
   const supabase = createClient();
 
   // type-casting here for convenience
@@ -33,6 +33,9 @@ export async function signup(email: string, password: string) {
   const response = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      emailRedirectTo: getURL()
+    }
   },);
 
   if (response.data && response.data.user) {
