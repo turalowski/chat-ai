@@ -1,19 +1,21 @@
+import { createClient } from '@/app/_utils/supabase/server'
 import { type EmailOtpType } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 
-import { createClient } from '@/app/_utils/supabase/server'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type') as EmailOtpType | null
-  const next = searchParams.get('next') ?? `/login`
+  const next = searchParams.get('next') ?? '/'
+
+  console.log('next', next)
 
   const redirectTo = request.nextUrl.clone()
+  console.log('redirectTo', redirectTo)
   redirectTo.pathname = next
   redirectTo.searchParams.delete('token_hash')
   redirectTo.searchParams.delete('type')
-  redirectTo.searchParams.append('message', 'Enter your credentials to login')
 
   if (token_hash && type) {
     const supabase = createClient()
