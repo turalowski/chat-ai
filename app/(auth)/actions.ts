@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { createClient } from '@/app/_utils/supabase/server';
+import { getURL } from '@/lib/utils';
 
 export async function login(email: string, password: string) {
   const supabase = createClient();
@@ -29,7 +30,10 @@ export async function signup(email: string, password: string) {
   // type-casting here for convenience
   // in practice, you should validate your inputs
 
-  const response = await supabase.auth.signUp({ email, password });
+  const response = await supabase.auth.signUp({
+    email,
+    password,
+  },);
 
   if (response.data && response.data.user) {
     // Check if the user got created
