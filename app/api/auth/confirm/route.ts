@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
     console.log('error', error)
     if (!error) {
       redirectTo.searchParams.delete('next')
+      console.log('redirectToooo', redirectTo)
       return NextResponse.redirect(redirectTo)
     }
   }
