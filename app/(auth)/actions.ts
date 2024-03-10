@@ -4,7 +4,6 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { createClient } from '@/app/_utils/supabase/server';
-import { getURL } from '@/lib/utils';
 
 export async function login(email: string, password: string) {
   const supabase = createClient();
