@@ -32,7 +32,7 @@ export async function signup(email: string, password: string,) {
     email,
     password, 
     options: {
-      emailRedirectTo: `/api/auth/confirm`
+      emailRedirectTo: `${getURL()}/api/auth/confirm`
     }
   },);
 
