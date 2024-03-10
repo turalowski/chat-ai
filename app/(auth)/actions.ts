@@ -33,9 +33,6 @@ export async function signup(email: string, password: string) {
   const response = await supabase.auth.signUp({
     email,
     password,
-    options: {
-      emailRedirectTo: `${getURL()}/api/auth/confirm`,
-    },
   },);
 
   if (response.data && response.data.user) {
