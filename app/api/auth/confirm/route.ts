@@ -18,10 +18,13 @@ export async function GET(request: NextRequest) {
       type,
       token_hash,
     })
-    if (!error) {
+    if (!error || error === null) {
       redirectTo.searchParams.delete('next')
       console.log('redirectToooo', redirectTo)
       return NextResponse.redirect('/')
     }
   }
+  // return the user to an error page with some instructions
+  redirectTo.pathname = '/error'
+  return NextResponse.redirect(redirectTo)
 }
