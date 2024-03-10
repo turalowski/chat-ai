@@ -9,7 +9,6 @@ export default function LoginPage() {
         <div className="w-full flex flex-col gap-6">
           <Suspense>
           <AuthForm submitButtonLabel="Login" handleSubmit={login} />
-
           </Suspense>
         </div>
       </nav>

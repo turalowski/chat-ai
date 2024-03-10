@@ -22,9 +22,10 @@ type Message = {
   message: string;
 };
 
-export default function ChatPage() {
+export default function ChatPage({ email }: { email: string }) {
   const [query, setQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [uploading, setUploading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [messageState, setMessageState] = useState<{
@@ -44,6 +45,7 @@ export default function ChatPage() {
 
   async function handleUploadClick() {
     try {
+      setUploading(true);
       const request = await fetch(`/api/pinecone/vectors`, {
         method: 'DELETE',
       });
@@ -56,22 +58,25 @@ export default function ChatPage() {
             method: 'POST',
             body: formData,
           });
-          console.log('request', request)
           if (request.ok) {
             toast({
               title: 'File has been uploaded',
             });
           } else {
-            throw new Error('Failed to upload the file.');
+            const message = await request.text();
+            throw new Error(message);
           }
         }
       } else {
-        throw new Error('Failed to clear vectorial database');
+        const message = await request.text();
+        throw new Error(message);
       }
     } catch (error: any) {
       toast({
         title: error.message,
       });
+    } finally {
+      setUploading(false);
     }
   }
 
@@ -130,7 +135,6 @@ export default function ChatPage() {
           history: [...state.history, [question, data.text]],
         }));
       }
-
       setLoading(false);
 
       //scroll to bottom
@@ -159,17 +163,25 @@ export default function ChatPage() {
               }
             }}
           />
-          <Button disabled={!file} onClick={handleUploadClick}>
+          <Button
+            disabled={!file || uploading}
+            onClick={handleUploadClick}
+            className="flex items-center gap-3"
+          >
+            {uploading && <ReloadIcon className="h-4 w-4 animate-spin" />}
             Upload
           </Button>
         </div>
-        <Button
-          onClick={() => {
-            logout();
-          }}
-        >
-          Logout
-        </Button>
+        <div className="flex items-center gap-3">
+          <span>{email}</span>
+          <Button
+            onClick={() => {
+              logout();
+            }}
+          >
+            Logout
+          </Button>
+        </div>
       </div>
       <div
         ref={messageListRef}
@@ -205,10 +217,9 @@ export default function ChatPage() {
           }}
         >
           <CardHeader className="p-2">
-            <CardTitle className="text-md">
-              Identify all the metrics and their values.
-            </CardTitle>
-            <CardDescription>Description for the question</CardDescription>
+            <CardDescription>
+              What is the topic of this document?
+            </CardDescription>
           </CardHeader>
         </Card>
         <Card
@@ -221,10 +232,7 @@ export default function ChatPage() {
           }}
         >
           <CardHeader className="p-2">
-            <CardTitle className="text-md">
-              Identify any inconsistency in the values of the metrics.
-            </CardTitle>
-            <CardDescription>Description for the question</CardDescription>
+            <CardDescription>What is the main highlights?</CardDescription>
           </CardHeader>
         </Card>
       </div>

@@ -15,6 +15,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ReloadIcon } from '@radix-ui/react-icons';
+import { useState } from 'react';
 
 const Messages: {
   [key: string]: string;
@@ -37,7 +39,7 @@ export function AuthForm({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const status = searchParams.get('status') as string;
+  const [loading, setLoading] = useState(false);
   const message = searchParams.get('message') as string;
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,8 +50,12 @@ export function AuthForm({
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const response = await handleSubmit(values.email, values.password);
-    console.log(response);
+    try {
+      setLoading(true);
+      const response = await handleSubmit(values.email, values.password);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -91,7 +97,12 @@ export function AuthForm({
               )}
             />
             <div className="flex items-center justify-center">
-              <Button type="submit" className="w-full">
+              <Button
+                type="submit"
+                className="w-full flex items-center gap-3"
+                disabled={loading}
+              >
+                {loading && <ReloadIcon className="h-4 w-4 animate-spin" />}
                 {submitButtonLabel}
               </Button>
             </div>
@@ -100,8 +111,8 @@ export function AuthForm({
         <div className="text-sm text-center">
           <span>
             {submitButtonLabel === 'Login'
-              ? 'Already have an account?'
-              : "You don't have an account yet?"}
+              ? "You don't have an account yet?"
+              : 'Already have an account?'}
           </span>
           <Button
             onClick={() => {

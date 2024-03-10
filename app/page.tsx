@@ -4,15 +4,18 @@ import { createClient } from '@/app/_utils/supabase/server';
 
 export default async function Home() {
   const supabase = createClient();
-
   const {
     data: { session },
-  } = await supabase.auth.getSession()
+  } = await supabase.auth.getSession();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!session) {
     // this is a protected route - only users who are signed in can view this route
-    redirect('/login')
+    redirect('/login');
   }
-  
-  return <ChatPage />;
+
+  return <ChatPage email={user?.email!} />;
 }
