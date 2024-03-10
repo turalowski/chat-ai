@@ -8,32 +8,22 @@ export async function GET(request: NextRequest) {
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type') as EmailOtpType | null
   const next = searchParams.get('next') ?? '/login'
-
-  console.log('next', next)
-
   const redirectTo = request.nextUrl.clone()
-  console.log('redirectTo', redirectTo)
   redirectTo.pathname = next
   redirectTo.searchParams.delete('token_hash')
   redirectTo.searchParams.delete('type')
-
-  console.log('token_hash', token_hash)
-  console.log('type', type)
   if (token_hash && type) {
     const supabase = createClient()
-
     const { error } = await supabase.auth.verifyOtp({
       type,
       token_hash,
     })
-    console.log('error', error)
     if (!error) {
       redirectTo.searchParams.delete('next')
       console.log('redirectToooo', redirectTo)
       return NextResponse.redirect('/')
     }
   }
-
   // return the user to an error page with some instructions
   redirectTo.pathname = '/error'
   return NextResponse.redirect(redirectTo)
