@@ -6,23 +6,26 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const token_hash = searchParams.get('token_hash');
   const type = searchParams.get('type') as EmailOtpType | null;
-  const next = searchParams.get('next') ?? `/login`;
+  const next = '/login';
   const redirectTo = request.nextUrl.clone();
   redirectTo.pathname = next;
   redirectTo.searchParams.delete('token_hash');
   redirectTo.searchParams.delete('type');
-  redirectTo.searchParams.delete('next');
-  redirectTo.searchParams.append('message', 'Please enter your credentials')
+  redirectTo.searchParams.append('message', 'Please enter your credentials');
   if (token_hash && type) {
     const supabase = createClient();
+
     const { error } = await supabase.auth.verifyOtp({
       type,
       token_hash,
     });
-    if (error) {
-      redirectTo.pathname = '/error';
+    if (!error) {
+      redirectTo.searchParams.delete('next');
+      return NextResponse.redirect(redirectTo);
     }
   }
-  console.log('redirectTo', redirectTo)
+
+  // return the user to an error page with some instructions
+  redirectTo.pathname = '/error';
   return NextResponse.redirect(redirectTo);
 }
