@@ -6,7 +6,6 @@ import { pinecone } from '@/app/_utils/pinecone-client';
 import { NextRequest } from 'next/server';
 import { createClient } from '@/app/_utils/supabase/server';
 
-
 /* Environment variables for Pinecone configuration */
 const PINECONE_NAME_SPACE = process.env.PINECONE_NAME_SPACE as string;
 const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME as string;
@@ -16,15 +15,14 @@ const ALLOWLIST = process.env.ALLOWLIST as string;
 export async function POST(request: NextRequest) {
   const supabase = createClient();
   const { data } = await supabase.auth.getUser();
-  if(!data.user?.email || !ALLOWLIST.includes(data?.user?.email)) {
+  if (!data.user?.email || !ALLOWLIST.includes(data?.user?.email)) {
     return new Response("You don't have a permission to use this endpoint", {
       status: 400,
     });
   }
   try {
     /* Extracting file from the request's form data */
-    const formData = await request.formData();
-    const uploadedFile = formData.get('file') as File;
+    const uploadedFile = await request.blob();
     if (!uploadedFile) {
       throw "Uploaded file couldn't find";
     }

@@ -50,12 +50,10 @@ export default function ChatPage({ email }: { email: string }) {
         method: 'DELETE',
       });
       if (request.ok) {
-        const formData = new FormData();
         if (file) {
-          formData.append('file', file);
           const request = await fetch('/api/store-document', {
             method: 'POST',
-            body: formData,
+            body: file,
           });
           if (request.ok) {
             toast({
@@ -224,10 +222,7 @@ export default function ChatPage({ email }: { email: string }) {
         <Card
           className="hover:bg-gray-100 hover:cursor-pointer"
           onClick={event => {
-            handleSubmit(
-              event,
-              'What is the main highlights?'
-            );
+            handleSubmit(event, 'What is the main highlights?');
           }}
         >
           <CardHeader className="p-2">
