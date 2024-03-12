@@ -210,13 +210,11 @@ export default function ChatPage({ email }: { email: string }) {
         <Card
           className="hover:bg-gray-100 hover:cursor-pointer"
           onClick={event => {
-            handleSubmit(event, 'What is the topic of this document?');
+            handleSubmit(event, 'What is the main topic');
           }}
         >
           <CardHeader className="p-2">
-            <CardDescription>
-              What is the topic of this document?
-            </CardDescription>
+            <CardDescription>What is the main topic?</CardDescription>
           </CardHeader>
         </Card>
         <Card
