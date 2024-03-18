@@ -11,6 +11,8 @@ export async function GET(request: NextRequest) {
   redirectTo.pathname = next;
   redirectTo.searchParams.delete('token_hash');
   redirectTo.searchParams.delete('type');
+  console.log('hash', token_hash);
+  console.log('type', type);
   if (token_hash && type) {
     const supabase = createClient();
 
@@ -18,12 +20,12 @@ export async function GET(request: NextRequest) {
       type,
       token_hash,
     });
+    console.log('error', error);
     if (!error || error === null) {
       redirectTo.searchParams.delete('next');
       return NextResponse.redirect(redirectTo);
     }
   }
-
   // return the user to an error page with some instructions
   redirectTo.pathname = '/error';
   return NextResponse.redirect(redirectTo);
