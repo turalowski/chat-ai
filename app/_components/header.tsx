@@ -7,10 +7,17 @@ import { Input } from '@/app/_components/ui/input';
 import { logout } from '@/app/_actions/auth';
 import { toast } from './ui/use-toast';
 import { postDocument } from '@/app/_actions/documents';
+import { useRouter } from 'next/navigation';
+import {
+  flushVectorialDatabase,
+  storeDocumentVectors,
+} from '../_actions/pinecone';
 
 export default function Header({ email }: { email: string }) {
   const [uploading, setUploading] = useState<boolean>(false);
   const [file, setFile] = useState<File | null>(null);
+
+  const router = useRouter();
 
   async function handleUploadClick() {
     try {
@@ -19,30 +26,15 @@ export default function Header({ email }: { email: string }) {
         const formData = new FormData();
         formData.set('file', file, file?.name);
         await postDocument(formData);
+        await flushVectorialDatabase();
+        await storeDocumentVectors(formData);
       }
-      return;
-      const request = await fetch(`/api/pinecone/vectors`, {
-        method: 'DELETE',
+
+
+      toast({
+        title: 'File has been uploaded',
       });
-      if (request.ok) {
-        if (file) {
-          const request = await fetch('/api/store-document', {
-            method: 'POST',
-            body: file,
-          });
-          if (request.ok) {
-            toast({
-              title: 'File has been uploaded',
-            });
-          } else {
-            const message = await request.text();
-            throw new Error(message);
-          }
-        }
-      } else {
-        const message = await request.text();
-        throw new Error(message);
-      }
+      router.refresh();
     } catch (error: any) {
       toast({
         title: error.message,
@@ -73,7 +65,6 @@ export default function Header({ email }: { email: string }) {
           disabled={!file || uploading}
           onClick={handleUploadClick}
           className="flex items-center gap-3"
-
         >
           {uploading && <ReloadIcon className="h-4 w-4 animate-spin" />}
           Upload

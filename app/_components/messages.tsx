@@ -2,20 +2,18 @@
 
 import { useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/app/_components/ui/avatar';
 import { MessageState } from '@/app/_lib/types';
+import { useAppContext } from '../_context/Chat';
 
-export default function Messages({
-  messageState,
-  email,
-}: {
-  messageState: MessageState;
-  email: string;
-}) {
-  const { messages } = messageState;
-
+export default function Messages() {
+  const { messageState } = useAppContext();
   const messageListRef = useRef<HTMLDivElement>(null);
-
+  const { messages } = messageState;
   return (
     <div className="flex gap-3 flex-col grow w-full col-span-4 text-sm">
       <div
