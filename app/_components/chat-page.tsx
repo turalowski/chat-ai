@@ -1,10 +1,6 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { ReloadIcon } from '@radix-ui/react-icons';
-import { Button } from '@/app/_components/ui/button';
-import { Input } from '@/app/_components/ui/input';
-import { SendHorizonalIcon } from 'lucide-react';
 import { SidebarNav } from './sidebar';
 import Header from './header';
 import Messages from './messages';
