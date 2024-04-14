@@ -8,7 +8,7 @@ import { SendHorizonalIcon } from 'lucide-react';
 import { SidebarNav } from './sidebar';
 import Header from './header';
 import Messages from './messages';
-import { useAppContext } from '@/app/context/Chat';
+import { useAppContext } from '@/context/Chat';
 import Suggestions from './suggestions';
 import NewMessage from './new-message';
 import ErrorAlert from './error-alert';

@@ -5,7 +5,7 @@ import { ReloadIcon } from '@radix-ui/react-icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SendHorizonalIcon } from 'lucide-react';
-import { useAppContext } from '@/app/context/Chat';
+import { useAppContext } from '@/context/Chat';
 
 export default function NewMessage() {
   const {

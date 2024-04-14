@@ -1,6 +1,6 @@
 'use client';
 
-import { useAppContext } from '@/app/context/Chat';
+import { useAppContext } from '@/context/Chat';
 
 export default function ErrorAlert() {
   const { error } = useAppContext();

@@ -2,9 +2,9 @@ import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { PineconeStore } from '@langchain/pinecone';
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
-import { pinecone } from '@/app/_utils/pinecone-client';
+import { pinecone } from '@/utils/pinecone-client';
 import { NextRequest } from 'next/server';
-import { createClient } from '@/app/_utils/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 
 /* Environment variables for Pinecone configuration */
 const PINECONE_NAME_SPACE = process.env.PINECONE_NAME_SPACE as string;

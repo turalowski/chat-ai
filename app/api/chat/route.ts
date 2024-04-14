@@ -1,8 +1,8 @@
 import type { Document } from 'langchain/document';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { PineconeStore } from '@langchain/pinecone';
-import { makeChain } from '@/app/_utils/makechain';
-import { pinecone } from '@/app/_utils/pinecone-client';
+import { makeChain } from '@/utils/makechain';
+import { pinecone } from '@/utils/pinecone-client';
 
 /* Retrieve Pinecone configurations from environment variables */
 const PINECONE_NAME_SPACE = process.env.PINECONE_NAME_SPACE as string;

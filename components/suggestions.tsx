@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import { Card, CardDescription, CardHeader } from '@/components/ui/card';
-import { useAppContext } from '@/app/context/Chat';
+import { useAppContext } from '@/context/Chat';
 
 export default function Suggestions() {
   const {

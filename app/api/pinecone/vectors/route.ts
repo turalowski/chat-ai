@@ -1,5 +1,5 @@
-import { pinecone } from '@/app/_utils/pinecone-client';
-import { createClient } from '@/app/_utils/supabase/server';
+import { pinecone } from '@/utils/pinecone-client';
+import { createClient } from '@/utils/supabase/server';
 import { NextRequest } from 'next/server';
 
 /* Environment variables for Pinecone configuration */
