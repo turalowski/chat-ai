@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/app/_utils/supabase/server';
 import { SupabaseClient, User } from '@supabase/supabase-js';
 import { randomUUID } from 'crypto';
 
