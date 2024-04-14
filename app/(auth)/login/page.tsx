@@ -1,4 +1,4 @@
-import { login } from '../actions';
+import { login } from '../../actions/auth';
 import { AuthForm } from '../_components/AuthForm';
 import { Suspense } from 'react';
 

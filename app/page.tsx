@@ -1,6 +1,7 @@
 import ChatPage from '@/components/chat-page';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/app/_utils/supabase/server';
+import { AppProvider } from './context/Chat';
 
 export default async function Home() {
   const supabase = createClient();
@@ -17,5 +18,9 @@ export default async function Home() {
     redirect('/login');
   }
 
-  return <ChatPage email={user?.email!} />;
+  return (
+    <AppProvider>
+      <ChatPage email={user?.email!} />
+    </AppProvider>
+  );
 }

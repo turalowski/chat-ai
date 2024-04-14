@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { AuthForm } from '../_components/AuthForm';
-import { signup } from '../actions';
+import { signup } from '../../actions/auth';
 
 export default function SignUp() {
   return (
