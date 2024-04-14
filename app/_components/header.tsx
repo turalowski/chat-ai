@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { ReloadIcon } from '@radix-ui/react-icons';
 import { Button } from '@/app/_components/ui/button';
 import { Input } from '@/app/_components/ui/input';
-import { logout } from '@/actions/auth';
+import { logout } from '@/app/_actions/auth';
 import { toast } from './ui/use-toast';
-import { postDocument } from '@/actions/documents';
+import { postDocument } from '@/app/_actions/documents';
 
 export default function Header({ email }: { email: string }) {
   const [uploading, setUploading] = useState<boolean>(false);
