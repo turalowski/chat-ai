@@ -10,7 +10,6 @@ import { Pinecone } from '@pinecone-database/pinecone';
 /* Environment variables for Pinecone configuration */
 const PINECONE_NAME_SPACE = process.env.PINECONE_NAME_SPACE as string;
 const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME as string;
-const ALLOWLIST = process.env.ALLOWLIST as string;
 
 /* Function to handle Delete request for document processing */
 export const flushVectorialDatabase=  async () => {
@@ -39,6 +38,11 @@ export const flushVectorialDatabase=  async () => {
 
 /* Function to handle POST request for document processing */
 export async function storeDocumentVectors(formdata: FormData) {
+
+    /* Get uploaded document from supabase storage */
+    const { data, error } = await client.storage
+    .from('documents')
+    .download(documentPath);
   const uploadedFile = formdata.get('file') as File;
   const pinecone = new Pinecone({
     apiKey: process.env.PINECONE_API_KEY as string,

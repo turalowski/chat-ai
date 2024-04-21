@@ -6,12 +6,14 @@ import { Button } from '@/app/_components/ui/button';
 import { Input } from '@/app/_components/ui/input';
 import { logout } from '@/app/_actions/auth';
 import { toast } from './ui/use-toast';
-import { postDocument } from '@/app/_actions/documents';
+import { updateUserDocuments } from '@/app/_actions/documents';
 import { useRouter } from 'next/navigation';
 import {
   flushVectorialDatabase,
   storeDocumentVectors,
 } from '../_actions/pinecone';
+import { createClient } from '../_utils/supabase/client';
+import { v4 } from 'uuid';
 
 export default function Header({ email }: { email: string }) {
   const [uploading, setUploading] = useState<boolean>(false);
@@ -20,21 +22,31 @@ export default function Header({ email }: { email: string }) {
   const router = useRouter();
 
   async function handleUploadClick() {
+    const client = createClient();
+    if (!file) {
+      throw new Error('You need to upload a file first');
+    }
     try {
       setUploading(true);
-      if (file) {
+      /* Upload document to Supabase Storage */
+      const { data: documentData, error: documentError } = await client.storage
+        .from('documents')
+        .upload(v4(), file);
+
+      if (documentError) {
+        throw documentError;
+      }
+      await updateUserDocuments(documentData?.path, file.name);
+
         const formData = new FormData();
         formData.set('file', file, file?.name);
-        await postDocument(formData);
         await flushVectorialDatabase();
         await storeDocumentVectors(formData);
-      }
 
-
-      toast({
-        title: 'File has been uploaded',
-      });
-      router.refresh();
+      // toast({
+      //   title: 'File has been uploaded',
+      // });
+      // router.refresh();
     } catch (error: any) {
       toast({
         title: error.message,

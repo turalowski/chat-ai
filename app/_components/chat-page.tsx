@@ -6,7 +6,6 @@ import NewMessage from './new-message';
 import ErrorAlert from './error-alert';
 import { getDocuments } from '../_actions/documents';
 
-
 const ChatPage = async ({ email }: { email: string }) => {
   const documents = await getDocuments();
   return (

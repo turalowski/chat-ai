@@ -14,13 +14,13 @@ export function SidebarNav({
   return (
     <nav
       className={cn(
-        'flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1 border-md border p-1 text-sm h-full rounded-md',
+        'flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1 border-md border p-1 text-sm h-full rounded-md overflow-hidden',
         className
       )}
       {...props}
     >
       <h1 className="text-md p-2">Files</h1>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 overflow-scroll">
         {documents.map(document => (
           <div
             key={document.id}
