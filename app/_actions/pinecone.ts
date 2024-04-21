@@ -12,14 +12,13 @@ const PINECONE_NAME_SPACE = process.env.PINECONE_NAME_SPACE as string;
 const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME as string;
 
 /* Function to handle Delete request for document processing */
-export const flushVectorialDatabase=  async () => {
+export const flushVectorialDatabase = async () => {
   try {
     const pinecone = new Pinecone({
       apiKey: process.env.PINECONE_API_KEY as string,
     });
     const index =
       pinecone.Index(PINECONE_INDEX_NAME); /* Change to your own index name */
-    console.log('index', index);
     await index.namespace(PINECONE_NAME_SPACE).deleteAll();
     /* Returning the processed document chunks in JSON format */
     return {
@@ -34,25 +33,28 @@ export const flushVectorialDatabase=  async () => {
     console.error(`Deleting vectors error: ${error.message}`);
     throw error;
   }
-}
+};
 
 /* Function to handle POST request for document processing */
-export async function storeDocumentVectors(formdata: FormData) {
-
-    /* Get uploaded document from supabase storage */
-    const { data, error } = await client.storage
+export async function storeDocumentVectors(documentPath: string) {
+  const client = createClient();
+  /* Get uploaded document from supabase storage */
+  const { data, error } = await client.storage
     .from('documents')
     .download(documentPath);
-  const uploadedFile = formdata.get('file') as File;
+
+  if (!data) {
+    throw new Error('Failed to find document');
+  }
   const pinecone = new Pinecone({
     apiKey: process.env.PINECONE_API_KEY as string,
   });
   try {
     /* Extracting file from the request's form data */
-    if (!uploadedFile) {
+    if (!data) {
       throw new Error("Uploaded file couldn't find");
     }
-    const fileBuffer = (await uploadedFile.arrayBuffer()) as Buffer;
+    const fileBuffer = (await data.arrayBuffer()) as Buffer;
     const fileBlob = new Blob([
       fileBuffer,
     ]); /* Creating a Blob from the Buffer for PDF loading */

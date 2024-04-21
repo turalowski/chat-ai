@@ -37,16 +37,13 @@ export default function Header({ email }: { email: string }) {
         throw documentError;
       }
       await updateUserDocuments(documentData?.path, file.name);
+      await flushVectorialDatabase();
+      await storeDocumentVectors(documentData?.path);
 
-        const formData = new FormData();
-        formData.set('file', file, file?.name);
-        await flushVectorialDatabase();
-        await storeDocumentVectors(formData);
-
-      // toast({
-      //   title: 'File has been uploaded',
-      // });
-      // router.refresh();
+      toast({
+        title: 'File has been uploaded',
+      });
+      router.refresh();
     } catch (error: any) {
       toast({
         title: error.message,
