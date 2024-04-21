@@ -10,9 +10,20 @@ import { Pinecone } from '@pinecone-database/pinecone';
 /* Environment variables for Pinecone configuration */
 const PINECONE_NAME_SPACE = process.env.PINECONE_NAME_SPACE as string;
 const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME as string;
+const ALLOWLIST = process.env.ALLOWLIST as string;
 
 /* Function to handle Delete request for document processing */
 export const flushVectorialDatabase = async () => {
+  const client = createClient();
+  const { data } = await client.auth.getUser();
+  if (!data.user?.email || !ALLOWLIST.includes(data?.user?.email)) {
+    return new Response(
+      "You don't have a permission to flush vectorial database",
+      {
+        status: 400,
+      }
+    );
+  }
   try {
     const pinecone = new Pinecone({
       apiKey: process.env.PINECONE_API_KEY as string,
@@ -38,6 +49,17 @@ export const flushVectorialDatabase = async () => {
 /* Function to handle POST request for document processing */
 export async function storeDocumentVectors(documentPath: string) {
   const client = createClient();
+  const {
+    data: userData,
+  } = await client.auth.getUser();
+  if (!userData.user?.email || !ALLOWLIST.includes(userData.user?.email)) {
+    return new Response(
+      "You don't have a permission to bind a document to chat",
+      {
+        status: 400,
+      }
+    );
+  }
   /* Get uploaded document from supabase storage */
   const { data, error } = await client.storage
     .from('documents')
