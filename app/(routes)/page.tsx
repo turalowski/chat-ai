@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/app/_utils/supabase/server'
 import { AppProvider } from '../_context/Chat'
 
-export const maxDuration = 60 // Applies to the actions
+export const maxDuration = 300 // Applies to the actions
 
 export default async function Home() {
     const supabase = createClient()
