@@ -8,11 +8,12 @@ import {
     AvatarImage,
 } from '@/app/_components/ui/avatar'
 import { useAppContext } from '../_context/Chat'
+import { Message } from 'postcss'
 
 export default function Messages() {
     const { messageState } = useAppContext()
-    const messageListRef = useRef<HTMLDivElement>(null)
     const { messages } = messageState
+    const messageListRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         messageListRef.current?.scrollTo(0, messageListRef.current.scrollHeight)
@@ -22,7 +23,7 @@ export default function Messages() {
         <div className="flex gap-3 flex-col grow w-full col-span-4 text-sm overflow-y-scroll h-12">
             <div
                 ref={messageListRef}
-                className="flex min-h-full flex-col border-gray-300 text-sm rounded-md border gap-3 p-6 overflow-scroll"
+                className="flex grow flex-col border-gray-300 text-sm rounded-md border gap-3 p-6 overflow-scroll"
             >
                 {messages.map((message, index) => {
                     return (
