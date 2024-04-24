@@ -38,7 +38,7 @@ export default function Header({ email }: { email: string }) {
             await updateUserDocuments(documentData?.path, file.name)
             await flushVectorialDatabase()
             await storeDocumentVectors(documentData?.path)
-
+            router.refresh()
             toast({
                 title: 'File has been uploaded',
             })
