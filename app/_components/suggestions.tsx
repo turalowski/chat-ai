@@ -92,11 +92,11 @@ export default function Suggestions() {
             <Card
                 className="hover:bg-gray-100 hover:cursor-pointer"
                 onClick={(event) => {
-                    handleSubmit(event, 'Summarize the document.')
+                    handleSubmit(event, 'Summarize this document.')
                 }}
             >
                 <CardHeader className="p-2">
-                    <CardDescription>Summarize the document.</CardDescription>
+                    <CardDescription>Summarize this document.</CardDescription>
                 </CardHeader>
             </Card>
             <Card
