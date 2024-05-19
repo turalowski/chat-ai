@@ -3,6 +3,7 @@ import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { PineconeStore } from '@langchain/pinecone';
 import { makeChain } from '@/app/_utils/makechain';
 import { pinecone } from '@/app/_utils/pinecone-client';
+import { createClient } from '@/app/_utils/supabase/server';
 
 /* Retrieve Pinecone configurations from environment variables */
 const PINECONE_NAME_SPACE = process.env.PINECONE_NAME_SPACE as string;
@@ -10,7 +11,7 @@ const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME as string;
 
 export async function POST(req: Request) {
   /* Parse the request body to extract the question and history */
-  const { question, history } = await req.json();
+  const { question, history, documentPath } = await req.json();
   try {
     /* Throw an error if the question field is missing */
     if (!question) {
@@ -20,16 +21,26 @@ export async function POST(req: Request) {
     const sanitizedQuestion = question.trim().replaceAll('\n', ' ');
     /* Initialize the Pinecone index with the given index name */
     const index = pinecone.Index(PINECONE_INDEX_NAME);
+
+    const supabase = createClient();
+
+
     /* Connect to the Pinecone vector store with the specified index, embedding model, and configurations */
     const vectorStore = await PineconeStore.fromExistingIndex(
       new OpenAIEmbeddings({}),
       {
         pineconeIndex: index,
         textKey: 'text',
+        filter: {
+          documentPath
+        },
         namespace:
           PINECONE_NAME_SPACE /* The namespace is configured in your environment or config folder */,
       }
     );
+
+
+    
     /* Promise setup to handle asynchronous retrieval of documents */
     let resolveWithDocuments: (value: Document[]) => void;
     const documentPromise = new Promise<Document[]>(resolve => {
@@ -60,6 +71,7 @@ export async function POST(req: Request) {
     });
     /* Await the resolution of document retrieval */
     const sourceDocuments = await documentPromise;
+
     /* Return the response along with source documents with a 200 status code */
     return Response.json(
       { text: response, sourceDocuments },

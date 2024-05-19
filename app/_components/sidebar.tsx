@@ -1,9 +1,16 @@
+'use client';
+
 import { cn } from '@/app/_lib/utils';
-import { Document } from '../_lib/types';
 import { Delete } from './delete';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
-  documents: Document[];
+  documents: {
+    id: number;
+    path: string;
+    name: string;
+    vector_ids: string[]
+  }[];
 }
 
 export function SidebarNav({
@@ -11,6 +18,27 @@ export function SidebarNav({
   className,
   ...props
 }: SidebarNavProps) {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const params = new URLSearchParams(
+    searchParams as unknown as URLSearchParams
+  );
+
+  const selectedDocumentId = params.get('document_id');
+
+  const onFileClick = (documentId: string) => {
+    const params = new URLSearchParams(
+      searchParams as unknown as URLSearchParams
+    );
+
+    params.set('document_id', documentId);
+    router.replace(`${pathname}?${params.toString()}`, {
+      scroll: false,
+    });
+  };
+
   return (
     <nav
       className={cn(
@@ -20,18 +48,19 @@ export function SidebarNav({
       {...props}
     >
       <h1 className="text-md p-2">Files</h1>
-      <div className="flex flex-col gap-1 overflow-scroll">
-        {documents.map(document => (
+      <div className="flex flex-col gap-1 overflow-scroll h-full">
+        {documents.map(({ id, path, name, vector_ids }) => (
           <div
-            key={document.id}
-            className="flex items-center justify-between hover:bg-slate-100 p-2 rounded-md"
+            key={id}
+            onClick={() => onFileClick(path)}
+            className={`flex items-center justify-between hover:bg-slate-100 p-2 rounded-md hover:cursor-pointer ${
+              selectedDocumentId === path ? 'bg-gray-100' : null
+            }`}
           >
             <span>
-              {document.name.length > 20
-                ? `${document.name.substring(0, 20)}...`
-                : document.name}
+              {name.length > 20 ? `${name.substring(0, 20)}...` : name}
             </span>
-            <Delete document_id={document.document_id} />
+            <Delete document_id={id} path={path} vectors={vector_ids} />
           </div>
         ))}
       </div>

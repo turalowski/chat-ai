@@ -1,41 +1,43 @@
-'use client'
+'use client';
 
-import { useRouter } from 'next/navigation'
-import { deleteDocument } from '../_actions/documents'
-import { TrashIcon } from './icons'
-import { toast } from './ui/use-toast'
-import { useTransition } from 'react'
-import { Spinner } from './spinner'
+import { useRouter } from 'next/navigation';
+import { deleteDocument } from '../_actions/documents';
+import { TrashIcon } from './icons';
+import { toast } from './ui/use-toast';
+import { useTransition } from 'react';
+import { Spinner } from './spinner';
 
 interface DeleteProps extends React.HTMLAttributes<HTMLElement> {
-    document_id: string
+  document_id: number;
+  path: string;
+  vectors: string[]
 }
 
-export function Delete({ document_id }: DeleteProps) {
-    const router = useRouter()
-    const [isPending, startTransition] = useTransition()
+export function Delete({ document_id, path, vectors }: DeleteProps) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
-    const onClick = async () => {
-        try {
-            startTransition(async () => {
-                await deleteDocument(document_id)
-                router.refresh()
-                toast({
-                    title: 'Selected file has been deleted',
-                })
-            })
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                toast({
-                    title: 'error.message',
-                })
-            }
-        }
+  const onClick = async () => {
+    try {
+      startTransition(async () => {
+        await deleteDocument(document_id, path, vectors);
+        router.refresh();
+        toast({
+          title: 'Selected file has been deleted',
+        });
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast({
+          title: 'error.message',
+        });
+      }
     }
+  };
 
-    return isPending ? (
-        <Spinner size="small" />
-    ) : (
-        <TrashIcon className="hover:cursor-pointer" onClick={onClick} />
-    )
+  return isPending ? (
+    <Spinner size="small" />
+  ) : (
+    <TrashIcon className="hover:cursor-pointer" onClick={onClick} />
+  );
 }
