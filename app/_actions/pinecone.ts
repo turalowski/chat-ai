@@ -22,12 +22,7 @@ function generateVectorId() {
 }
 
 /* Function to handle Delete request for document processing */
-export const flushVectorialDatabase = async () => {
-  const client = createClient();
-  const { data } = await client.auth.getUser();
-  if (!data.user?.email || !ALLOWLIST.includes(data?.user?.email)) {
-    throw new Error("You don't have a permission to flush vectorial database");
-  }
+export const flushPineconeIndex = async () => {
   try {
     const pinecone = new Pinecone({
       apiKey: process.env.PINECONE_API_KEY as string,
@@ -35,6 +30,31 @@ export const flushVectorialDatabase = async () => {
     const index =
       pinecone.Index(PINECONE_INDEX_NAME); /* Change to your own index name */
     await index.namespace(PINECONE_NAME_SPACE).deleteAll();
+    /* Returning the processed document chunks in JSON format */
+    return {
+      message: 'Success',
+      success: true,
+    };
+  } catch (error: any) {
+    if (error.name === 'PineconeNotFoundError') {
+      return { message: 'Success', success: true };
+    }
+    /* Handling errors during document processing */
+    console.error(`Deleting vectors error: ${error.message}`);
+    throw error;
+  }
+};
+
+
+/* Function to handle Delete request for document processing */
+export const deleteVectorsByDocumentPath = async (vectors: string[]) => {
+  try {
+    const pinecone = new Pinecone({
+      apiKey: process.env.PINECONE_API_KEY as string,
+    });
+    const index =
+      pinecone.Index(PINECONE_INDEX_NAME); /* Change to your own index name */
+    await index.namespace(PINECONE_NAME_SPACE).deleteMany(vectors);
     /* Returning the processed document chunks in JSON format */
     return {
       message: 'Success',

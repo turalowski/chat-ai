@@ -3,6 +3,7 @@
 import { createClient } from '@/app/_utils/supabase/server';
 import { QueryData } from '@supabase/supabase-js';
 import { Document as DocumentType } from '@/app/_lib/types';
+import { deleteVectorsByDocumentPath } from './pinecone';
 
 export const addDocumentToDatabse = async (
   path: string,
@@ -78,9 +79,9 @@ export async function getDocuments() {
   if (user) {
     const response = supabase
       .from('user_documents')
-      .select('documents(name, id, path)')
+      .select('documents(name, id, path, vector_ids)')
       .eq('user_id', user.id)
-      .returns<{ documents: { name: string; id: number; path: string } }[]>();
+      .returns<{ documents: { name: string; id: number; path: string, vector_ids: string[] } }[]>();
 
     const { data, error } = await response;
 
@@ -93,7 +94,6 @@ export async function getDocuments() {
         ...dataItem.documents,
       }));
 
-      console.log('ds', documents);
       return documents;
     } else {
       return [];
@@ -101,18 +101,18 @@ export async function getDocuments() {
   }
 }
 
-export async function deleteDocument(id: number) {
+export async function deleteDocument(id: number, path: string, vectors: string[]) {
   const supabase = createClient();
+
+  await deleteVectorsByDocumentPath(vectors);
+
   /* Delete the file from user_files table */
   const { error: tableError } = await supabase
     .from('user_documents')
     .delete()
     .eq('document_id', id);
 
-    await supabase
-    .from('documents')
-    .delete()
-    .eq('id', id);
+  await supabase.from('documents').delete().eq('id', id);
 
   if (tableError) {
     console.error(
@@ -122,12 +122,8 @@ export async function deleteDocument(id: number) {
     throw tableError;
   }
 
-  // /* Delete the file from "documents" storage bucket */
-  // const { error: storageError } = await supabase.storage
-  //   .from('documents')
-  //   .remove([id]);
-  // if (storageError) {
-  //   console.error('Error deleting item from storage:', storageError.message);
-  //   throw storageError;
-  // }
+  /* Delete the file from "documents" storage bucket */
+  const { error: storageError } = await supabase.storage
+    .from('documents')
+    .remove([String(path)]);
 }

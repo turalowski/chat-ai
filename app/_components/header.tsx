@@ -11,10 +11,7 @@ import {
   updateUserDocuments,
 } from '@/app/_actions/documents';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import {
-  flushVectorialDatabase,
-  storeDocumentVectors,
-} from '../_actions/pinecone';
+import { flushPineconeIndex, storeDocumentVectors } from '../_actions/pinecone';
 import { createClient } from '../_utils/supabase/client';
 import { v4 } from 'uuid';
 
@@ -42,15 +39,18 @@ export default function Header({ email }: { email: string }) {
         throw documentError;
       }
       const { vectorIds } = await storeDocumentVectors(documentData?.path);
-      const documentId = await addDocumentToDatabse(documentData?.path, file.name, vectorIds);
-      await updateUserDocuments(documentId)
+      const documentId = await addDocumentToDatabse(
+        documentData?.path,
+        file.name,
+        vectorIds
+      );
+      await updateUserDocuments(documentId);
 
       const params = new URLSearchParams(
-        searchParams as unknown as URLSearchParams,
+        searchParams as unknown as URLSearchParams
       );
 
-      
-      params.set("document_id", documentData?.path);
+      params.set('document_id', documentData?.path);
       router.replace(`${pathname}?${params.toString()}`, {
         scroll: false,
       });

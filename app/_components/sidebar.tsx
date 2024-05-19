@@ -9,6 +9,7 @@ interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
     id: number;
     path: string;
     name: string;
+    vector_ids: string[]
   }[];
 }
 
@@ -48,7 +49,7 @@ export function SidebarNav({
     >
       <h1 className="text-md p-2">Files</h1>
       <div className="flex flex-col gap-1 overflow-scroll h-full">
-        {documents.map(({ id, path, name }) => (
+        {documents.map(({ id, path, name, vector_ids }) => (
           <div
             key={id}
             onClick={() => onFileClick(path)}
@@ -59,7 +60,7 @@ export function SidebarNav({
             <span>
               {name.length > 20 ? `${name.substring(0, 20)}...` : name}
             </span>
-            <Delete document_id={id} />
+            <Delete document_id={id} path={path} vectors={vector_ids} />
           </div>
         ))}
       </div>
