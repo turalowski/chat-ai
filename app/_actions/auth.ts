@@ -56,8 +56,6 @@ export async function logout() {
   const { error } = await supabase.auth.signOut();
 
   if (error) {
-    console.log('/signout message', error.message);
-    console.log('/signout cause', error.cause);
     redirect(`/login?status=${error.name}`);
   }
 

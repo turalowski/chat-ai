@@ -1,11 +1,46 @@
 'use server';
 
 import { createClient } from '@/app/_utils/supabase/server';
-import { Document as DocumentType } from '../_lib/types';
+import { QueryData } from '@supabase/supabase-js';
+import { Document as DocumentType } from '@/app/_lib/types';
+
+export const addDocumentToDatabse = async (
+  path: string,
+  name: string,
+  vectors: string[]
+): Promise<number> => {
+  try {
+    const client = createClient();
+
+    /* Retrieve a user */
+    const {
+      data: { user },
+    } = await client.auth.getUser();
+
+    if (user) {
+      /* Insert file id user id to a user_files table */
+      const { data, error } = await client
+        .from('documents')
+        .insert([{ path, name, vector_ids: vectors }])
+        .select();
+
+      if (error) {
+        throw error;
+      }
+
+      const documentId = data![0].id as number;
+      return documentId;
+    } else {
+      throw new Error('User information is missing');
+    }
+  } catch (error: unknown) {
+    console.error('updateUserDocuments ', (error as Error).message);
+    throw new Error('Failed to store the file in database');
+  }
+};
 
 export const updateUserDocuments = async (
-  documentPath: string,
-  documentName: string
+  documentId: number
 ): Promise<void> => {
   try {
     const client = createClient();
@@ -18,10 +53,8 @@ export const updateUserDocuments = async (
     if (user) {
       /* Insert file id user id to a user_files table */
       const { data, error } = await client
-        .from('user_files')
-        .insert([
-          { document_id: documentPath, user_id: user.id, name: documentName },
-        ]);
+        .from('user_documents')
+        .insert([{ user_id: user.id, document_id: documentId }]);
 
       if (error) {
         throw error;
@@ -41,42 +74,60 @@ export async function getDocuments() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
   if (user) {
-    const { data, error } = await supabase
-      .from('user_files')
-      .select('*')
-      .eq('user_id', user.id);
+    const response = supabase
+      .from('user_documents')
+      .select('documents(name, id, path)')
+      .eq('user_id', user.id)
+      .returns<{ documents: { name: string; id: number; path: string } }[]>();
+
+    const { data, error } = await response;
 
     if (error) {
       throw error;
     }
-    return data as unknown as DocumentType[];
+
+    if (data) {
+      const documents = data?.map(dataItem => ({
+        ...dataItem.documents,
+      }));
+
+      console.log('ds', documents);
+      return documents;
+    } else {
+      return [];
+    }
   }
 }
 
-export async function deleteDocument(id: string) {
+export async function deleteDocument(id: number) {
   const supabase = createClient();
   /* Delete the file from user_files table */
   const { error: tableError } = await supabase
-    .from('user_files')
+    .from('user_documents')
     .delete()
     .eq('document_id', id);
 
+    await supabase
+    .from('documents')
+    .delete()
+    .eq('id', id);
+
   if (tableError) {
-    console.log(
+    console.error(
       'Error deleting item from user files table:',
       tableError.message
     );
     throw tableError;
   }
 
-  /* Delete the file from "documents" storage bucket */
-  const { error: storageError } = await supabase.storage
-    .from('documents')
-    .remove([id]);
-  if (storageError) {
-    console.log('Error deleting item from storage:', storageError.message);
-    throw storageError;
-  }
+  // /* Delete the file from "documents" storage bucket */
+  // const { error: storageError } = await supabase.storage
+  //   .from('documents')
+  //   .remove([id]);
+  // if (storageError) {
+  //   console.error('Error deleting item from storage:', storageError.message);
+  //   throw storageError;
+  // }
 }
-

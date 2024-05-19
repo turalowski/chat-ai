@@ -8,7 +8,7 @@ import { useTransition } from 'react'
 import { Spinner } from './spinner'
 
 interface DeleteProps extends React.HTMLAttributes<HTMLElement> {
-    document_id: string
+    document_id: number
 }
 
 export function Delete({ document_id }: DeleteProps) {

@@ -68,6 +68,7 @@ export async function storeDocumentVectors(documentPath: string) {
   const pinecone = new Pinecone({
     apiKey: process.env.PINECONE_API_KEY as string,
   });
+
   try {
     /* Extracting file from the request's form data */
     if (!data) {
@@ -96,7 +97,7 @@ export async function storeDocumentVectors(documentPath: string) {
     /* Create and store the embeddings in the vectorStore */
     const embeddings = new OpenAIEmbeddings();
     const index =
-      pinecone.Index(PINECONE_INDEX_NAME); /* Change to your own index name */
+      pinecone.index(PINECONE_INDEX_NAME); /* Change to your own index name */
 
     /* Embed the PDF documents and collect vector IDs */
     const vectorIds = [];
@@ -104,14 +105,14 @@ export async function storeDocumentVectors(documentPath: string) {
       const embedding = await embeddings.embedQuery(chunk.pageContent);
       const vectorId = generateVectorId();
       vectorIds.push(vectorId);
-      console.log(chunk.metadata);
       await index.upsert([
         {
           id: vectorId,
           values: embedding,
           metadata: {
             ...chunk.metadata.pdf.info,
-            text: chunk.pageContent
+            text: chunk.pageContent,
+            documentPath: documentPath,
           },
         },
       ]);
@@ -121,7 +122,7 @@ export async function storeDocumentVectors(documentPath: string) {
       message: 'Success',
       success: true,
       chunksWithMetadata: JSON.stringify(documentChunks),
-      vectorIds: vectorIds
+      vectorIds: vectorIds,
     };
   } catch (error: any) {
     console.error(`Storing document error: ${error.message}`);
