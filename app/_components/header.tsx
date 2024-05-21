@@ -6,10 +6,7 @@ import { Button } from '@/app/_components/ui/button';
 import { Input } from '@/app/_components/ui/input';
 import { logout } from '@/app/_actions/auth';
 import { toast } from './ui/use-toast';
-import {
-  addDocumentToDatabse,
-  updateUserDocuments,
-} from '@/app/_actions/documents';
+
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { flushPineconeIndex, storeDocumentVectors } from '../_actions/pinecone';
 import { createClient } from '../_utils/supabase/client';
@@ -38,13 +35,7 @@ export default function Header({ email }: { email: string }) {
       if (documentError) {
         throw documentError;
       }
-      const { vectorIds } = await storeDocumentVectors(documentData?.path);
-      const documentId = await addDocumentToDatabse(
-        documentData?.path,
-        file.name,
-        vectorIds
-      );
-      await updateUserDocuments(documentId);
+      await storeDocumentVectors(documentData?.path, file.name);
 
       const params = new URLSearchParams(
         searchParams as unknown as URLSearchParams

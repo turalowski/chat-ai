@@ -10,17 +10,16 @@ import { Spinner } from './spinner';
 interface DeleteProps extends React.HTMLAttributes<HTMLElement> {
   document_id: number;
   path: string;
-  vectors: string[]
 }
 
-export function Delete({ document_id, path, vectors }: DeleteProps) {
+export function Delete({ document_id, path }: DeleteProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const onClick = async () => {
     try {
       startTransition(async () => {
-        await deleteDocument(document_id, path, vectors);
+        await deleteDocument(document_id, path);
         router.refresh();
         toast({
           title: 'Selected file has been deleted',
@@ -35,9 +34,16 @@ export function Delete({ document_id, path, vectors }: DeleteProps) {
     }
   };
 
-  return isPending ? (
-    <Spinner size="small" />
-  ) : (
-    <TrashIcon className="hover:cursor-pointer" onClick={onClick} />
+  return (
+    <div>
+      {isPending ? (
+        <Spinner size="small" />
+      ) : (
+        <TrashIcon
+          className="hover:cursor-pointer text-sm "
+          onClick={onClick}
+        />
+      )}
+    </div>
   );
 }
