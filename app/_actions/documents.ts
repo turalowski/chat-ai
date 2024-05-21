@@ -1,14 +1,11 @@
 'use server';
 
 import { createClient } from '@/app/_utils/supabase/server';
-import { QueryData } from '@supabase/supabase-js';
-import { Document as DocumentType } from '@/app/_lib/types';
 import { deleteVectorsByDocumentPath } from './pinecone';
 
 export const addDocumentToDatabse = async (
   path: string,
   name: string,
-  vectors: string[]
 ): Promise<number> => {
   try {
     const client = createClient();
@@ -22,7 +19,7 @@ export const addDocumentToDatabse = async (
       /* Insert file id user id to a user_files table */
       const { data, error } = await client
         .from('documents')
-        .insert([{ path, name, vector_ids: vectors }])
+        .insert([{ path, name }])
         .select();
 
       if (error) {
@@ -79,9 +76,9 @@ export async function getDocuments() {
   if (user) {
     const response = supabase
       .from('user_documents')
-      .select('documents(name, id, path, vector_ids)')
+      .select('documents(name, id, path)')
       .eq('user_id', user.id)
-      .returns<{ documents: { name: string; id: number; path: string, vector_ids: string[] } }[]>();
+      .returns<{ documents: { name: string; id: number; path: string} }[]>();
 
     const { data, error } = await response;
 
@@ -101,10 +98,10 @@ export async function getDocuments() {
   }
 }
 
-export async function deleteDocument(id: number, path: string, vectors: string[]) {
+export async function deleteDocument(id: number, path: string) {
   const supabase = createClient();
 
-  await deleteVectorsByDocumentPath(vectors);
+  await deleteVectorsByDocumentPath(path);
 
   /* Delete the file from user_files table */
   const { error: tableError } = await supabase

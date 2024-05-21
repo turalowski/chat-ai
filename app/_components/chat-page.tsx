@@ -15,7 +15,7 @@ const ChatPage = async ({
 }) => {
   let documents = await getDocuments();
   return (
-    <main className="h-screen flex flex-col px-3 2xl:px-96 gap-6 py-6 items-center justify-center">
+    <main className="h-screen flex flex-col px-3 3xl:px-48 gap-6 py-6 items-center justify-center">
       <Header email={email} />
       <div className="grow flex-row  w-full grid grid-cols-5 gap-3">
         <div className="col-span-1">

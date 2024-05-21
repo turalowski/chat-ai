@@ -15,5 +15,4 @@ export type Document = {
   name: string;
   path: string;
   created_at: string;
-  vector_ids: string[];
 };
