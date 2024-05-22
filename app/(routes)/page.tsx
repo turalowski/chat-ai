@@ -10,14 +10,15 @@ export default async function Home({
 }: {
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
+  const documentPath =
+    typeof searchParams?.document_id === 'string'
+      ? searchParams.document_id
+      : undefined;
+
   const supabase = createClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   if (!session) {
     // this is a protected route - only users who are signed in can view this route
@@ -26,14 +27,7 @@ export default async function Home({
 
   return (
     <AppProvider>
-      <ChatPage
-        email={user?.email!}
-        document_id={
-          typeof searchParams?.document_id === 'string'
-            ? searchParams.document_id
-            : undefined
-        }
-      />
+      <ChatPage documentPath={documentPath} />
     </AppProvider>
   );
 }

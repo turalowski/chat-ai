@@ -8,7 +8,7 @@ import { logout } from '@/app/_actions/auth';
 import { toast } from './ui/use-toast';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { flushPineconeIndex, storeDocumentVectors } from '../_actions/pinecone';
+import { storeDocumentVectors } from '../_actions/pinecone';
 import { createClient } from '../_utils/supabase/client';
 import { v4 } from 'uuid';
 
@@ -21,35 +21,39 @@ export default function Header({ email }: { email: string }) {
   const router = useRouter();
 
   async function handleUploadClick() {
+    // Create a client instance
     const client = createClient();
+    // Check if a file is selected
     if (!file) {
       throw new Error('You need to upload a file first');
     }
     try {
+      // Set uploading state to true
       setUploading(true);
       /* Upload document to Supabase Storage */
       const { data: documentData, error: documentError } = await client.storage
         .from('documents')
         .upload(v4(), file);
-
+      // Throw error if upload fails
       if (documentError) {
         throw documentError;
       }
+      // Split document into chunks, store in supabase table and pinecone database
       await storeDocumentVectors(documentData?.path, file.name);
-
+      // Update URL parameters with document ID
       const params = new URLSearchParams(
         searchParams as unknown as URLSearchParams
       );
-
       params.set('document_id', documentData?.path);
       router.replace(`${pathname}?${params.toString()}`, {
         scroll: false,
       });
-
+      // Display success message
       toast({
         title: 'File has been uploaded',
       });
     } catch (error: any) {
+      // Display error message
       toast({
         title: error.message,
       });

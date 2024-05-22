@@ -1,34 +1,45 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { deleteDocument } from '../_actions/documents';
 import { TrashIcon } from './icons';
 import { toast } from './ui/use-toast';
-import { useTransition } from 'react';
+import { MouseEventHandler, useTransition } from 'react';
 import { Spinner } from './spinner';
 
 interface DeleteProps extends React.HTMLAttributes<HTMLElement> {
-  document_id: number;
-  path: string;
+  documentId: number;
+  documentPath: string;
 }
 
-export function Delete({ document_id, path }: DeleteProps) {
+export function Delete({ documentId, documentPath }: DeleteProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
-  const onClick = async () => {
+  const params = new URLSearchParams(
+    searchParams as unknown as URLSearchParams
+  );
+
+  const onClick: MouseEventHandler<SVGGElement> = async event => {
+    event.stopPropagation();
     try {
       startTransition(async () => {
-        await deleteDocument(document_id, path);
-        router.refresh();
+        await deleteDocument(documentId, documentPath);
+        params.delete('document_id');
+        router.replace(`${pathname}?${params.toString()}`, {
+          scroll: false,
+        });
         toast({
           title: 'Selected file has been deleted',
         });
       });
     } catch (error: unknown) {
       if (error instanceof Error) {
+        console.log('Delete document error: ', error.message)
         toast({
-          title: 'error.message',
+          title: 'Failed to delete the document'
         });
       }
     }

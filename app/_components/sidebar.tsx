@@ -3,6 +3,7 @@
 import { cn } from '@/app/_lib/utils';
 import { Delete } from './delete';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useAppContext } from '../_context/Chat';
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   documents: {
@@ -31,7 +32,6 @@ export function SidebarNav({
     const params = new URLSearchParams(
       searchParams as unknown as URLSearchParams
     );
-
     params.set('document_id', documentId);
     router.replace(`${pathname}?${params.toString()}`, {
       scroll: false,
@@ -59,7 +59,7 @@ export function SidebarNav({
             <span>
               {name.length > 20 ? `${name.substring(0, 20)}...` : name}
             </span>
-            <Delete document_id={id} path={path} />
+            <Delete documentId={id} documentPath={path} />
           </div>
         ))}
       </div>
