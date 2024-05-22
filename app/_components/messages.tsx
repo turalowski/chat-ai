@@ -8,9 +8,8 @@ import {
   AvatarImage,
 } from '@/app/_components/ui/avatar';
 import { useAppContext } from '../_context/Chat';
-import { Message } from 'postcss';
 
-export default function Messages({ document_id }: { document_id: string | undefined }) {
+export default function Messages({ documentPath }: { documentPath: string | undefined }) {
   const { messageState, setMessageState } = useAppContext();
   const { messages } = messageState;
   const messageListRef = useRef<HTMLDivElement>(null);
@@ -20,7 +19,7 @@ export default function Messages({ document_id }: { document_id: string | undefi
       messages: [],
       history: [],
     });
-  }, [document_id]);
+  }, [documentPath]);
 
   useEffect(() => {
     messageListRef.current?.scrollTo(0, messageListRef.current.scrollHeight);

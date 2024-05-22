@@ -11,8 +11,9 @@ const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME as string;
 
 export async function POST(req: Request) {
   /* Parse the request body to extract the question and history */
-  const { question, history, documentPath } = await req.json();
   try {
+  const { question, history, documentPath } = await req.json();
+
     /* Throw an error if the question field is missing */
     if (!question) {
       throw new Error('No question in the request.');
@@ -21,9 +22,6 @@ export async function POST(req: Request) {
     const sanitizedQuestion = question.trim().replaceAll('\n', ' ');
     /* Initialize the Pinecone index with the given index name */
     const index = pinecone.Index(PINECONE_INDEX_NAME);
-
-    const supabase = createClient();
-
 
     /* Connect to the Pinecone vector store with the specified index, embedding model, and configurations */
     const vectorStore = await PineconeStore.fromExistingIndex(

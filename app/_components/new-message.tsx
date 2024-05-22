@@ -9,9 +9,9 @@ import { useAppContext } from '@/app/_context/Chat';
 import { useSearchParams } from 'next/navigation';
 
 export default function NewMessage({
-  document_id,
+  documentPath,
 }: {
-  document_id: string | undefined;
+  documentPath: string | undefined;
 }) {
   const {
     query,
@@ -69,7 +69,7 @@ export default function NewMessage({
         },
         body: JSON.stringify({
           question: question || manual,
-          documentPath: document_id,
+          documentPath,
           history,
         }),
       });
