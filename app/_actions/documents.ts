@@ -5,7 +5,7 @@ import { deleteVectorsByDocumentPath } from './pinecone';
 
 export const addDocumentToDatabse = async (
   path: string,
-  name: string,
+  name: string
 ): Promise<number> => {
   try {
     const client = createClient();
@@ -67,32 +67,37 @@ export const updateUserDocuments = async (
 };
 
 export async function getDocuments() {
+  // Create a client instance for Supabase
   const supabase = createClient();
-  /* Retrieve a user */
+  // Retrieve the currently authenticated user
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // If a user is authenticated
   if (user) {
+    // Query the 'user_documents' table to select documents where user_id matches the authenticated user's id
     const response = supabase
       .from('user_documents')
       .select('documents(name, id, path)')
       .eq('user_id', user.id)
-      .returns<{ documents: { name: string; id: number; path: string} }[]>();
-
+      .returns<{ documents: { name: string; id: number; path: string } }[]>();
+    // Await the response from the query
     const { data, error } = await response;
-
+    // If there is an error, throw the error
     if (error) {
       throw error;
     }
-
+    // If data is returned
     if (data) {
+      // Map the data to extract document details
       const documents = data?.map(dataItem => ({
         ...dataItem.documents,
       }));
-
+      // Return the documents array
       return documents;
     } else {
+      // If no data is returned, return an empty array
       return [];
     }
   }
