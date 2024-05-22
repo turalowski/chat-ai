@@ -1,11 +1,12 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { deleteDocument } from '../_actions/documents';
 import { TrashIcon } from './icons';
 import { toast } from './ui/use-toast';
-import { useTransition } from 'react';
+import { MouseEventHandler, useTransition } from 'react';
 import { Spinner } from './spinner';
+import { useAppContext } from '../_context/Chat';
 
 interface DeleteProps extends React.HTMLAttributes<HTMLElement> {
   document_id: number;
@@ -15,12 +16,24 @@ interface DeleteProps extends React.HTMLAttributes<HTMLElement> {
 export function Delete({ document_id, path }: DeleteProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
-  const onClick = async () => {
+  const params = new URLSearchParams(
+    searchParams as unknown as URLSearchParams
+  );
+
+  const currentDocumentId = params.get('document_id');
+
+  const onClick: MouseEventHandler<SVGGElement> = async event => {
+    event.stopPropagation();
     try {
       startTransition(async () => {
         await deleteDocument(document_id, path);
-        router.refresh();
+        params.delete('document_id');
+        router.replace(`${pathname}?${params.toString()}`, {
+          scroll: false,
+        });
         toast({
           title: 'Selected file has been deleted',
         });

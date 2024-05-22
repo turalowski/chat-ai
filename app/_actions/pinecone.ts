@@ -55,8 +55,9 @@ export const deleteVectorsByDocumentPath = async (path: string) => {
         ?.filter(vector => vector !== undefined)
         .map(vector => vector?.id);
 
-      console.log('vectors', vectors);
-      await index.deleteMany(vectors!);
+      if (vectors?.length) {
+        await index.deleteMany(vectors);
+      }
       if (results.pagination?.next) {
         paginationToken = results.pagination?.next;
       } else {

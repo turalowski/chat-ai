@@ -3,6 +3,8 @@
 import { cn } from '@/app/_lib/utils';
 import { Delete } from './delete';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
+import { useAppContext } from '../_context/Chat';
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   documents: {
@@ -20,6 +22,7 @@ export function SidebarNav({
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
+  const { messageState, setMessageState } = useAppContext();
 
   const params = new URLSearchParams(
     searchParams as unknown as URLSearchParams

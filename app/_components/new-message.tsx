@@ -6,8 +6,13 @@ import { Button } from '@/app/_components/ui/button';
 import { Input } from '@/app/_components/ui/input';
 import { SendHorizonalIcon } from 'lucide-react';
 import { useAppContext } from '@/app/_context/Chat';
+import { useSearchParams } from 'next/navigation';
 
-export default function NewMessage({ document_id }: { document_id: string | undefined }) {
+export default function NewMessage({
+  document_id,
+}: {
+  document_id: string | undefined;
+}) {
   const {
     query,
     setQuery,
@@ -18,6 +23,14 @@ export default function NewMessage({ document_id }: { document_id: string | unde
     setMessageState,
   } = useAppContext();
   const { history } = messageState;
+
+  const searchParams = useSearchParams();
+
+  const params = new URLSearchParams(
+    searchParams as unknown as URLSearchParams
+  );
+
+  const selectedDocumentPath = params.get('document_id');
 
   const messageListRef = useRef<HTMLDivElement>(null);
   const textAreaRef = useRef<HTMLInputElement>(null);
@@ -104,7 +117,7 @@ export default function NewMessage({ document_id }: { document_id: string | unde
         value={query}
         onChange={e => setQuery(e.target.value)}
       />
-      <Button type="submit" disabled={loading}>
+      <Button type="submit" disabled={loading || !selectedDocumentPath}>
         {loading ? (
           <ReloadIcon className="h-4 w-4 animate-spin" />
         ) : (
