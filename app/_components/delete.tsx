@@ -22,24 +22,30 @@ export function Delete({ documentId, documentPath }: DeleteProps) {
     searchParams as unknown as URLSearchParams
   );
 
+  const selectedDocumentPath = params.get('document_id');
+
   const onClick: MouseEventHandler<SVGGElement> = async event => {
     event.stopPropagation();
     try {
       startTransition(async () => {
         await deleteDocument(documentId, documentPath);
-        params.delete('document_id');
-        router.replace(`${pathname}?${params.toString()}`, {
-          scroll: false,
-        });
+        if (selectedDocumentPath === documentPath) {
+          params.delete('document_id');
+          router.replace(`${pathname}?${params.toString()}`, {
+            scroll: false,
+          });
+        } else {
+          router.refresh();
+        }
         toast({
           title: 'Selected file has been deleted',
         });
       });
     } catch (error: unknown) {
       if (error instanceof Error) {
-        console.log('Delete document error: ', error.message)
+        console.log('Delete document error: ', error.message);
         toast({
-          title: 'Failed to delete the document'
+          title: 'Failed to delete the document',
         });
       }
     }
