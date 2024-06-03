@@ -12,7 +12,11 @@ const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME as string;
 export async function POST(req: Request) {
   /* Parse the request body to extract the question and history */
   try {
-  const { question, history, documentPath } = await req.json();
+    const { question, history, documentPath } = await req.json();
+
+    if (!documentPath) {
+      throw new Error('Select a document first.');
+    }
 
     /* Throw an error if the question field is missing */
     if (!question) {
@@ -30,15 +34,12 @@ export async function POST(req: Request) {
         pineconeIndex: index,
         textKey: 'text',
         filter: {
-          documentPath
+          documentPath,
         },
         namespace:
           PINECONE_NAME_SPACE /* The namespace is configured in your environment or config folder */,
       }
     );
-
-
-    
     /* Promise setup to handle asynchronous retrieval of documents */
     let resolveWithDocuments: (value: Document[]) => void;
     const documentPromise = new Promise<Document[]>(resolve => {

@@ -91,6 +91,7 @@ export async function storeDocumentVectors(
   documentPath: string,
   documentName: string
 ) {
+  var startTime = new Date().getTime();
   try {
     // Create a Supabase client instance
     const client = createClient();
@@ -126,7 +127,7 @@ export async function storeDocumentVectors(
     /* Splitting document text into smaller chunks for processing */
     const textSplitter = new RecursiveCharacterTextSplitter({
       chunkSize: 1000 /* Maximum size of each text chunk */,
-      chunkOverlap: 200 /* Characters to overlap between chunks for context preservation */,
+      chunkOverlap: 200 /* Characters to overlap between chunks for */,
     });
     /* Applying the text splitter to the processed PDF document */
     const documentChunks = await textSplitter.splitDocuments(pdfDocument);
@@ -137,12 +138,10 @@ export async function storeDocumentVectors(
     /* Embed the PDF documents and collect vector IDs */
     const itemsToUpsert = [];
     // Embed the PDF documents and collect vector IDs
-    const readyEmbeddings = await Promise.all(
-      documentChunks.map(
-        async documentChunk =>
-          await embeddings.embedQuery(documentChunk.pageContent)
-      )
+    const readyEmbeddings = await embeddings.embedDocuments(
+      documentChunks.map(documentChunk => documentChunk.pageContent)
     );
+
     // Create vector items to upsert
     for (const [index, chunk] of documentChunks.entries()) {
       const vectorId = `${documentPath}#chunk${index}`;
@@ -169,6 +168,13 @@ export async function storeDocumentVectors(
     // Add document to database and update user documents
     const documentId = await addDocumentToDatabse(documentPath, documentName);
     await updateUserDocuments(documentId);
+
+    var endTime = new Date().getTime();
+
+    // Calculate the elapsed time
+    var elapsedTime = endTime - startTime;
+
+    console.log('Processing time: ' + elapsedTime + ' milliseconds');
     // Return success message
     return {
       message: 'Success',

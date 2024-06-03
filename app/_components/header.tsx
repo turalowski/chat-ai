@@ -36,6 +36,7 @@ export default function Header({ email }: { email: string }) {
         .upload(v4(), file);
       // Throw error if upload fails
       if (documentError) {
+        console.error('Failed to store the document in Supabase Filestore', documentError)
         throw documentError;
       }
       // Split document into chunks, store in supabase table and pinecone database
