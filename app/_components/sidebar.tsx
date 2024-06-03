@@ -3,7 +3,9 @@
 import { cn } from '@/app/_lib/utils';
 import { Delete } from './delete';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useAppContext } from '../_context/Chat';
+import { useTransition } from 'react';
+import { Spinner } from './spinner';
+import { File } from 'lucide-react';
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   documents: {
@@ -21,6 +23,7 @@ export function SidebarNav({
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   const params = new URLSearchParams(
     searchParams as unknown as URLSearchParams
@@ -29,12 +32,12 @@ export function SidebarNav({
   const selectedDocumentId = params.get('document_id');
 
   const onFileClick = (documentId: string) => {
-    const params = new URLSearchParams(
-      searchParams as unknown as URLSearchParams
-    );
-    params.set('document_id', documentId);
-    router.replace(`${pathname}?${params.toString()}`, {
-      scroll: false,
+    startTransition(() => {
+      const params = new URLSearchParams(searchParams);
+      params.set('document_id', documentId);
+      router.replace(`${pathname}?${params.toString()}`, {
+        scroll: false,
+      });
     });
   };
 
@@ -52,14 +55,22 @@ export function SidebarNav({
           <div
             key={id}
             onClick={() => onFileClick(path)}
-            className={`flex items-center justify-between hover:bg-slate-100 p-2 rounded-md hover:cursor-pointer ${
+            className={`flex items-center justify-start hover:bg-slate-100 p-2 gap-1 rounded-md hover:cursor-pointer ${
               selectedDocumentId === path ? 'bg-gray-100' : null
             }`}
           >
+            {isPending && params.get('document_id') === path ? (
+              <Spinner size="small" />
+            ) : (
+              <File size="16px" />
+            )}
             <span>
               {name.length > 20 ? `${name.substring(0, 20)}...` : name}
             </span>
-            <Delete documentId={id} documentPath={path} />
+
+            <div className="ml-auto">
+              <Delete documentId={id} documentPath={path} />
+            </div>
           </div>
         ))}
       </div>
