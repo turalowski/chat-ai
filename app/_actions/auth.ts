@@ -58,7 +58,5 @@ export async function logout() {
   if (error) {
     redirect(`/login?status=${error.name}`);
   }
-
-  revalidatePath('/');
-  redirect('/');
+  redirect('/login');
 }
