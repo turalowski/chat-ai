@@ -4,6 +4,10 @@
 
 This project is developed and tested with Node.js version **20.10.0**. It is important to use this version or later for compatibility reasons. Ensure that your development environment is set up with this version to avoid potential issues related to version discrepancies.
 
+### Useful information
+
+Maximum file size to upload is 50MB. This limitation is related to Free tier of Supabase.
+
 ### Used Packages
 
 Below is a list of the npm packages that are integral to the project's functionality. These packages are specified with their names and the versions are not strictly pinned, allowing for minor updates. It is recommended to install them using the version ranges provided to ensure compatibility while also benefiting from non-breaking improvements and fixes.
