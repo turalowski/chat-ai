@@ -5,6 +5,8 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTransition } from 'react';
 import { FileIcon, FolderIcon, LogOut } from 'lucide-react';
 import { Button } from './ui/button';
+import { logout } from '../_actions/auth';
+import { Spinner } from './spinner';
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {}
 
@@ -43,15 +45,23 @@ export function Menu({ className, ...props }: SidebarNavProps) {
       )}
       {...props}
     >
-      <div className='flex flex-col items-center gap-3'>
+      <div className="flex flex-col items-center gap-3">
         <Button variant="outline" size="icon" onClick={onFileClick}>
-          <FileIcon size={16} />
+          {isPending && menu === 'group' ? (
+            <Spinner size="small" />
+          ) : (
+            <FileIcon size={16} />
+          )}
         </Button>
         <Button variant="outline" size="icon" onClick={onGroupClick}>
-          <FolderIcon size={16} />
+          {isPending && menu !== 'group' ? (
+            <Spinner size="small" />
+          ) : (
+            <FolderIcon size={16} />
+          )}
         </Button>
       </div>
-      <Button variant="outline" size="icon" onClick={onFileClick}>
+      <Button variant="outline" size="icon" onClick={logout}>
         <LogOut size={16} />
       </Button>
     </nav>

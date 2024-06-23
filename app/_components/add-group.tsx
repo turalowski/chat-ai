@@ -79,11 +79,11 @@ export function AddGroup({ documents, className, ...props }: SidebarNavProps) {
         onOpenChange={() => setIsModalOpen(!isModalOpen)}
       >
         <DialogTrigger asChild>
-          <Button variant="outline" size="icon" disabled={isPending}>
+          <Button variant="outline" size="icon" className='h-8 w-8' disabled={isPending}>
             {isPending ? (
               <ReloadIcon className="h-4 w-4 animate-spin" />
             ) : (
-              <FolderPlus size={16} />
+              <FolderPlus className='h-4 w-4' size={16} />
             )}
           </Button>
         </DialogTrigger>

@@ -5,7 +5,7 @@ import Suggestions from './suggestions';
 import NewMessage from './new-message';
 import ErrorAlert from './error-alert';
 import { createClient } from '../_utils/supabase/server';
-import { Menu } from './manu';
+import { Menu } from './menu';
 import { SidebarFiles } from './sidebar-files';
 import { SidebarGroups } from './sidebar-groups';
 
@@ -29,7 +29,7 @@ const ChatPage = async ({
         </div>
         <div className="">
           <SidebarNav>
-            {menu === 'file' && <SidebarFiles />}
+            {menu !== 'group' && <SidebarFiles />}
             {menu === 'group' && <SidebarGroups />}
           </SidebarNav>
         </div>
