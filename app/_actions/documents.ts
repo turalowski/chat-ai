@@ -100,12 +100,13 @@ export async function getDocuments() {
       // If no data is returned, return an empty array
       return [];
     }
+  } else {
+    throw new Error('User not found')
   }
 }
 
 export async function deleteDocument(id: number, path: string) {
   const supabase = createClient();
-
   await deleteVectorsByDocumentPath(path);
 
   /* Delete the file from user_files table */

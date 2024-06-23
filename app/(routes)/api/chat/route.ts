@@ -34,7 +34,9 @@ export async function POST(req: Request) {
         pineconeIndex: index,
         textKey: 'text',
         filter: {
-          documentPath,
+          documentPath: {
+            $in: [documentPath]
+          },
         },
         namespace:
           PINECONE_NAME_SPACE /* The namespace is configured in your environment or config folder */,
