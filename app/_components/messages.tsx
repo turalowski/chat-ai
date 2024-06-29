@@ -8,18 +8,27 @@ import {
   AvatarImage,
 } from '@/app/_components/ui/avatar';
 import { useAppContext } from '../_context/Chat';
+import { useSearchParams } from 'next/navigation';
 
-export default function Messages({ documentPath }: { documentPath: string | undefined }) {
+export default function Messages() {
   const { messageState, setMessageState } = useAppContext();
   const { messages } = messageState;
   const messageListRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
+  const params = new URLSearchParams(
+    searchParams as unknown as URLSearchParams
+  );
+
+  const document_id = params.get('document_id');
+  const group_id = params.get('group_id');
+  const menu = params.get('menu')
 
   useEffect(() => {
     setMessageState({
       messages: [],
       history: [],
     });
-  }, [documentPath]);
+  }, [group_id, document_id, menu]);
 
   useEffect(() => {
     messageListRef.current?.scrollTo(0, messageListRef.current.scrollHeight);
@@ -35,20 +44,19 @@ export default function Messages({ documentPath }: { documentPath: string | unde
           return (
             <div
               key={`chatMessage-${index}`}
-              className={`border border-gray-200 rounded-md p-3`}
+              className={`flex items-center gap-3 ${
+                message.type === 'apiMessage' ? 'flex-row-reverse' : 'ME'
+              }`}
             >
-              <div className="flex items-center gap-3">
-                <Avatar className="w-8 h-8">
-                  <AvatarImage className="w-2 h-2" alt="@shadcn" />
-                  <AvatarFallback className="text-sm">
-                    {message.type === 'apiMessage' ? 'AI' : 'ME'}
-                  </AvatarFallback>
-                </Avatar>
-                <p className="text-md font-bold">
+              <Avatar className="w-8 h-8">
+                <AvatarImage className="w-2 h-2" alt="@shadcn" />
+                <AvatarFallback className="text-sm">
                   {message.type === 'apiMessage' ? 'AI' : 'ME'}
-                </p>
+                </AvatarFallback>
+              </Avatar>
+              <div className={`border border-gray-200 rounded-md p-3`}>
+                <ReactMarkdown>{message.message}</ReactMarkdown>
               </div>
-              <ReactMarkdown>{message.message}</ReactMarkdown>
             </div>
           );
         })}

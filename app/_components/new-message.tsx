@@ -31,6 +31,7 @@ export default function NewMessage({
   );
 
   const selectedDocumentPath = params.get('document_id');
+  const groupId = params.get('group_id');
 
   const messageListRef = useRef<HTMLDivElement>(null);
   const textAreaRef = useRef<HTMLInputElement>(null);
@@ -70,6 +71,7 @@ export default function NewMessage({
         body: JSON.stringify({
           question: question || manual,
           documentPath,
+          groupId,
           history,
         }),
       });
@@ -117,7 +119,10 @@ export default function NewMessage({
         value={query}
         onChange={e => setQuery(e.target.value)}
       />
-      <Button type="submit" disabled={loading || !selectedDocumentPath}>
+      <Button
+        type="submit"
+        disabled={loading || (!selectedDocumentPath && !groupId)}
+      >
         {loading ? (
           <ReloadIcon className="h-4 w-4 animate-spin" />
         ) : (

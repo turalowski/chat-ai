@@ -15,6 +15,9 @@ export default async function Home({
       ? searchParams.document_id
       : undefined;
 
+  const menu =
+    typeof searchParams?.menu === 'string' ? searchParams.menu : 'menu';
+
   const supabase = createClient();
   const {
     data: { session },
@@ -27,7 +30,7 @@ export default async function Home({
 
   return (
     <AppProvider>
-      <ChatPage documentPath={documentPath} />
+      <ChatPage documentPath={documentPath} menu={menu} />
     </AppProvider>
   );
 }

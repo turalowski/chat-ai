@@ -4,6 +4,7 @@ import { PineconeStore } from '@langchain/pinecone';
 import { makeChain } from '@/app/_utils/makechain';
 import { pinecone } from '@/app/_utils/pinecone-client';
 import { createClient } from '@/app/_utils/supabase/server';
+import { VectorStore } from 'langchain/vectorstores/base';
 
 /* Retrieve Pinecone configurations from environment variables */
 const PINECONE_NAME_SPACE = process.env.PINECONE_NAME_SPACE as string;
@@ -12,10 +13,10 @@ const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME as string;
 export async function POST(req: Request) {
   /* Parse the request body to extract the question and history */
   try {
-    const { question, history, documentPath } = await req.json();
+    const { question, history, documentPath, groupId } = await req.json();
 
-    if (!documentPath) {
-      throw new Error('Select a document first.');
+    if (!documentPath && !groupId) {
+      throw new Error('Select a document or group first first.');
     }
 
     /* Throw an error if the question field is missing */
@@ -26,6 +27,46 @@ export async function POST(req: Request) {
     const sanitizedQuestion = question.trim().replaceAll('\n', ' ');
     /* Initialize the Pinecone index with the given index name */
     const index = pinecone.Index(PINECONE_INDEX_NAME);
+    let documentPaths: string[] = [];
+
+    if (documentPath) {
+      documentPaths = [documentPath];
+    }
+
+    if (groupId) {
+      console.log('group groupId', groupId);
+      // Create a client instance for Supabase
+      const supabase = createClient();
+      // Retrieve the currently authenticated user
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      // If a user is authenticated
+      if (user) {
+        // Query the 'user_documents' table to select documents where user_id matches the authenticated user's id
+        const response = supabase
+          .from('document_groups')
+          .select()
+          .eq('id', groupId)
+          .returns<
+            {
+              id: number;
+              name: string;
+              document_paths: string[];
+              user_id: string;
+            }[]
+          >();
+        const { data, error } = await response;
+        if (data && data.length > 0) {
+          documentPaths = data[0].document_paths;
+        }
+      } else {
+        throw new Error('User id is missing');
+      }
+    }
+
+    console.log('testtt', documentPaths)
 
     /* Connect to the Pinecone vector store with the specified index, embedding model, and configurations */
     const vectorStore = await PineconeStore.fromExistingIndex(
@@ -34,7 +75,9 @@ export async function POST(req: Request) {
         pineconeIndex: index,
         textKey: 'text',
         filter: {
-          documentPath,
+          documentPath: {
+            $in: documentPaths,
+          },
         },
         namespace:
           PINECONE_NAME_SPACE /* The namespace is configured in your environment or config folder */,
