@@ -9,9 +9,10 @@ import { TrashIcon } from 'lucide-react';
 interface DeleteProps extends React.HTMLAttributes<HTMLElement> {
   documentId: number;
   documentPath: string;
+  isFileLoading: boolean;
 }
 
-export function Delete({ documentId, documentPath }: DeleteProps) {
+export function Delete({ isFileLoading, documentId, documentPath }: DeleteProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const searchParams = useSearchParams();
@@ -25,6 +26,9 @@ export function Delete({ documentId, documentPath }: DeleteProps) {
 
   const onClick: MouseEventHandler<SVGGElement> = async event => {
     event.stopPropagation();
+    if(isFileLoading) {
+      return;
+    }
     try {
       startTransition(async () => {
         await deleteDocument(documentId, documentPath);
