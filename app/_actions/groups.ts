@@ -50,6 +50,7 @@ export async function getGroups() {
     const response = supabase
       .from('document_groups')
       .select()
+      .eq('user_id', user.id)
       .returns<{ id: number; name: string, docuemnt_ids: string[]; user_id: string }[]>();
     // Await the response from the query
     const { data, error } = await response;
