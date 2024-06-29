@@ -20,7 +20,7 @@ export function SidebarFile({ document }: SidebarNavProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [isFileLoading, startTransition] = useTransition();
 
   const params = new URLSearchParams(
     searchParams as unknown as URLSearchParams
@@ -29,6 +29,9 @@ export function SidebarFile({ document }: SidebarNavProps) {
   const selectedDocumentId = params.get('document_id');
 
   const onFileClick = (documentId: string) => {
+    if (isFileLoading) {
+      return;
+    }
     startTransition(() => {
       const params = new URLSearchParams(searchParams);
       params.set('document_id', documentId);
@@ -47,11 +50,15 @@ export function SidebarFile({ document }: SidebarNavProps) {
       )}
     >
       <div className="flex items-center gap-1">
-        {isPending ? <Spinner size="small" /> : <File size={14} />}
+        {isFileLoading ? <Spinner size="small" /> : <File size={14} />}
         <span>{name.length > 20 ? `${name.substring(0, 20)}...` : name}</span>
       </div>
 
-      <Delete documentId={id} documentPath={path} />
+      <Delete
+        isFileLoading={isFileLoading}
+        documentId={id}
+        documentPath={path}
+      />
     </div>
   );
 }

@@ -19,7 +19,7 @@ export const addDocumentToDatabse = async (
       /* Insert file id user id to a user_files table */
       const { data, error } = await client
         .from('documents')
-        .insert([{ path, name }])
+        .insert([{ path, name, user_id: user.id }])
         .select();
 
       if (error) {
