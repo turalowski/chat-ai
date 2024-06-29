@@ -41,22 +41,16 @@ export default function Messages() {
       >
         {messages.map((message, index) => {
           return (
-            <div
-              key={`chatMessage-${index}`}
-              className={`border border-gray-200 rounded-md p-3`}
-            >
-              <div className="flex items-center gap-3">
-                <Avatar className="w-8 h-8">
-                  <AvatarImage className="w-2 h-2" alt="@shadcn" />
-                  <AvatarFallback className="text-sm">
-                    {message.type === 'apiMessage' ? 'AI' : 'ME'}
-                  </AvatarFallback>
-                </Avatar>
-                <p className="text-md font-bold">
+            <div key={`chatMessage-${index}`} className='flex items-center gap-3'>
+              <Avatar className="w-8 h-8">
+                <AvatarImage className="w-2 h-2" alt="@shadcn" />
+                <AvatarFallback className="text-sm">
                   {message.type === 'apiMessage' ? 'AI' : 'ME'}
-                </p>
+                </AvatarFallback>
+              </Avatar>
+              <div className={`border border-gray-200 rounded-md p-3`}>
+                <ReactMarkdown>{message.message}</ReactMarkdown>
               </div>
-              <ReactMarkdown>{message.message}</ReactMarkdown>
             </div>
           );
         })}
