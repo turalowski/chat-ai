@@ -21,13 +21,14 @@ export default function Messages() {
 
   const document_id = params.get('document_id');
   const group_id = params.get('group_id');
+  const menu = params.get('menu')
 
   useEffect(() => {
     setMessageState({
       messages: [],
       history: [],
     });
-  }, [group_id, document_id]);
+  }, [group_id, document_id, menu]);
 
   useEffect(() => {
     messageListRef.current?.scrollTo(0, messageListRef.current.scrollHeight);
@@ -41,7 +42,12 @@ export default function Messages() {
       >
         {messages.map((message, index) => {
           return (
-            <div key={`chatMessage-${index}`} className='flex items-center gap-3'>
+            <div
+              key={`chatMessage-${index}`}
+              className={`flex items-center gap-3 ${
+                message.type === 'apiMessage' ? 'flex-row-reverse' : 'ME'
+              }`}
+            >
               <Avatar className="w-8 h-8">
                 <AvatarImage className="w-2 h-2" alt="@shadcn" />
                 <AvatarFallback className="text-sm">
