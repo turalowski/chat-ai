@@ -18,6 +18,7 @@ import { FormEvent, useState, useTransition } from 'react';
 import { addGroup } from '../_actions/groups';
 import { useRouter } from 'next/navigation';
 import { ReloadIcon } from '@radix-ui/react-icons';
+import { toast } from './ui/use-toast';
 
 interface CheckboxEvent extends React.ChangeEvent<HTMLInputElement> {}
 
@@ -62,6 +63,12 @@ export function AddGroup({ documents, className, ...props }: SidebarNavProps) {
   };
 
   const onSaveClick = async () => {
+    if (!groupName) {
+      toast({
+        title: "Group name can't be empty",
+      });
+      return;
+    }
     startTransition(async () => {
       try {
         const selectedDocumentsPath = selectedDocuments.map(
