@@ -1,5 +1,4 @@
 import { SidebarNav } from './sidebar';
-import Header from './header';
 import Messages from './messages';
 import Suggestions from './suggestions';
 import NewMessage from './new-message';
@@ -22,10 +21,9 @@ const ChatPage = async ({
   } = await supabase.auth.getUser();
   return (
     <main className="h-screen flex flex-col px-3 3xl:px-48 gap-6 py-6 items-center justify-center">
-      <Header email={user?.email!} />
       <div className="grow w-full flex flex-row gap-3">
         <div className="">
-          <Menu />
+          <Menu email={user?.email!} />
         </div>
         <div className="">
           <SidebarNav>
@@ -34,7 +32,7 @@ const ChatPage = async ({
           </SidebarNav>
         </div>
         <div className="flex gap-3 flex-col grow w-full ">
-          <Messages documentPath={documentPath} />
+          <Messages />
           <Suggestions />
           <NewMessage documentPath={documentPath} />
           <ErrorAlert />

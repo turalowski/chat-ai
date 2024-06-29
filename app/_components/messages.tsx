@@ -8,18 +8,26 @@ import {
   AvatarImage,
 } from '@/app/_components/ui/avatar';
 import { useAppContext } from '../_context/Chat';
+import { useSearchParams } from 'next/navigation';
 
-export default function Messages({ documentPath }: { documentPath: string | undefined }) {
+export default function Messages() {
   const { messageState, setMessageState } = useAppContext();
   const { messages } = messageState;
   const messageListRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
+  const params = new URLSearchParams(
+    searchParams as unknown as URLSearchParams
+  );
+
+  const document_id = params.get('document_id');
+  const group_id = params.get('group_id');
 
   useEffect(() => {
     setMessageState({
       messages: [],
       history: [],
     });
-  }, [documentPath]);
+  }, [group_id, document_id]);
 
   useEffect(() => {
     messageListRef.current?.scrollTo(0, messageListRef.current.scrollHeight);

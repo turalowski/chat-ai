@@ -5,6 +5,8 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTransition } from 'react';
 import { Spinner } from './spinner';
 import clsx from 'clsx';
+import { deleteGroup } from '../_actions/groups';
+import { toast } from './ui/use-toast';
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   group: {
@@ -32,12 +34,25 @@ export function SidebarGroup({ group, className, ...props }: SidebarNavProps) {
       startTransition(() => {
         const params = new URLSearchParams(searchParams);
         params.set('group_id', String(group.id));
-        params.delete('document_id')
+        params.delete('document_id');
         router.replace(`${pathname}?${params.toString()}`, {
           scroll: false,
         });
       });
     }
+  };
+
+  const handleDeleteClick = (id: string) => {
+    startTransition(async () => {
+      await deleteGroup(id);
+      if (selectedGroup === id) {
+        params.delete('group_id');
+      }
+      router.refresh();
+      toast({
+        title: 'Deleted group',
+      });
+    });
   };
 
   return (
@@ -53,7 +68,14 @@ export function SidebarGroup({ group, className, ...props }: SidebarNavProps) {
         {isPending ? <Spinner size="small" /> : <FolderIcon size={14} />}
         {group.name}
       </div>
-      <TrashIcon size={14} color="red" />
+      <TrashIcon
+        size={14}
+        color="red"
+        onClick={event => {
+          event.stopPropagation();
+          handleDeleteClick(String(group.id));
+        }}
+      />
     </div>
   );
 }

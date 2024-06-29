@@ -69,3 +69,22 @@ export async function getGroups() {
     throw new Error('User not found');
   }
 }
+
+export async function deleteGroup(id: string) {
+  const supabase = createClient();
+
+  /* Delete the file from user_files table */
+  const { error: tableError } = await supabase
+    .from('document_groups')
+    .delete()
+    .eq('id', id);
+
+
+  if (tableError) {
+    console.error(
+      'Error deleting item from document groups table:',
+      tableError.message
+    );
+    throw tableError;
+  }
+}
