@@ -7,23 +7,15 @@ import { Input } from '@/app/_components/ui/input';
 import { SendHorizonalIcon } from 'lucide-react';
 import { useAppContext } from '@/app/_context/Chat';
 import { useSearchParams } from 'next/navigation';
+import useChat from '../_hooks/useChat';
 
-export default function NewMessage({
-  documentPath,
-}: {
-  documentPath: string | undefined;
-}) {
+export default function NewMessage() {
   const {
     query,
     setQuery,
     loading,
-    setLoading,
-    setError,
-    messageState,
-    setMessageState,
   } = useAppContext();
-  const { history } = messageState;
-
+  const { handleSubmit } = useChat();
   const searchParams = useSearchParams();
 
   const params = new URLSearchParams(
@@ -33,75 +25,7 @@ export default function NewMessage({
   const selectedDocumentPath = params.get('document_id');
   const groupId = params.get('group_id');
 
-  const messageListRef = useRef<HTMLDivElement>(null);
   const textAreaRef = useRef<HTMLInputElement>(null);
-
-  async function handleSubmit(e: any, manual?: string) {
-    e.preventDefault();
-
-    setError(null);
-
-    if (!query && !manual) {
-      alert('Please input a question');
-      return;
-    }
-
-    const question = query.trim();
-
-    setMessageState(state => ({
-      ...state,
-      messages: [
-        ...state.messages,
-        {
-          type: 'userMessage',
-          message: manual || question,
-        },
-      ],
-    }));
-
-    setLoading(true);
-    setQuery('');
-
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          question: question || manual,
-          documentPath,
-          groupId,
-          history,
-        }),
-      });
-      const data = await response.json();
-
-      if (data.error) {
-        setError(data.error);
-      } else {
-        setMessageState(state => ({
-          ...state,
-          messages: [
-            ...state.messages,
-            {
-              type: 'apiMessage',
-              message: data.text,
-              sourceDocs: data.sourceDocuments,
-            },
-          ],
-          history: [...state.history, [question, data.text]],
-        }));
-      }
-      setLoading(false);
-
-      //scroll to bottom
-      messageListRef.current?.scrollTo(0, messageListRef.current.scrollHeight);
-    } catch (error) {
-      setLoading(false);
-      setError('An error occurred while fetching the data. Please try again.');
-    }
-  }
 
   return (
     <form className="w-full flex gap-3" onSubmit={handleSubmit}>

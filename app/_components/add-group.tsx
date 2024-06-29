@@ -43,6 +43,10 @@ export function AddGroup({ documents, className, ...props }: SidebarNavProps) {
   );
 
   const toggleDocument = (checked: boolean | string, path: string) => {
+    // Prevent adding more documents if the length of selectedDocuments is 3
+    if (checked === true && selectedDocuments.length >= 3) {
+      return;
+    }
     if (typeof checked === 'boolean') {
       const newDynamicDocuments = dynamicDocuments.map(dynamicDocument => {
         if (dynamicDocument.path === path) {
@@ -79,21 +83,22 @@ export function AddGroup({ documents, className, ...props }: SidebarNavProps) {
         onOpenChange={() => setIsModalOpen(!isModalOpen)}
       >
         <DialogTrigger asChild>
-          <Button variant="outline" size="icon" className='h-8 w-8' disabled={isPending}>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8"
+            disabled={isPending}
+          >
             {isPending ? (
               <ReloadIcon className="h-4 w-4 animate-spin" />
             ) : (
-              <FolderPlus className='h-4 w-4' size={16} />
+              <FolderPlus className="h-4 w-4" size={16} />
             )}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Create a new group</DialogTitle>
-            <DialogDescription>
-              Enter group name and select files to create a new group. Max 3
-              files are allowed.
-            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="items-center gap-4">
@@ -110,7 +115,7 @@ export function AddGroup({ documents, className, ...props }: SidebarNavProps) {
             </div>
             <div className="items-center gap-4 mb-4">
               <Label htmlFor="username" className="text-right ">
-                Files
+                Files (Max 3 files allowed)
               </Label>
               <div className="flex mt-4 flex-col gap-3 min-h-full max-h-[200px] overflow-scroll">
                 {dynamicDocuments.map(document => (

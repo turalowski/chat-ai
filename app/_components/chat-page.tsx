@@ -34,7 +34,7 @@ const ChatPage = async ({
         <div className="flex gap-3 flex-col grow w-full ">
           <Messages />
           <Suggestions />
-          <NewMessage documentPath={documentPath} />
+          <NewMessage />
           <ErrorAlert />
         </div>
       </div>
