@@ -85,6 +85,7 @@ export function AddFile({ documents, className, ...props }: SidebarNavProps) {
         id="file"
         className="hidden"
         type="file"
+        value={undefined}
         accept="application/pdf"
         onChange={event => {
           const file = event?.target?.files?.[0];
