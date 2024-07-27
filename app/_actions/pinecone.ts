@@ -120,9 +120,13 @@ export async function storeDocumentVectors(
     const pdfLoader = new PDFLoader(fileBlob);
     let pdfDocument = await pdfLoader.load();
     /* Normalize the page content by replacing newline characters with spaces */
-    pdfDocument = pdfDocument.map(page => ({
+    pdfDocument = pdfDocument.map((page, index) => ({
       ...page,
       pageContent: page.pageContent.replaceAll('\n', ' '),
+      metadata: {
+        ...page.metadata,
+        pageNumber: index + 1, // Add page number to metadata
+      },
     }));
     /* Splitting document text into smaller chunks for processing */
     const textSplitter = new RecursiveCharacterTextSplitter({
@@ -150,6 +154,7 @@ export async function storeDocumentVectors(
         values: readyEmbeddings[index],
         metadata: {
           ...chunk.metadata.pdf.info,
+          pageNumber: chunk.metadata.pageNumber,
           text: chunk.pageContent,
           documentPath: documentPath,
         },

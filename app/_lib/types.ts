@@ -1,6 +1,12 @@
 type Message = {
   type: 'apiMessage' | 'userMessage';
   message: string;
+  sourceDocs: {
+    pageContent: string,
+    metadata: {
+      pageNumber: number
+    }
+  }[]
 };
 
 export type MessageState = {

@@ -12,6 +12,8 @@ interface AppContextType {
   setError: React.Dispatch<React.SetStateAction<string | null>>;
   messageState: MessageState;
   setMessageState: React.Dispatch<React.SetStateAction<MessageState>>;
+  page: number,
+  setPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -22,6 +24,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   const [query, setQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState<number>(1)
   const [messageState, setMessageState] = useState<MessageState>({
     messages: [],
     history: [],
@@ -36,6 +39,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     setError,
     messageState,
     setMessageState,
+    page,
+    setPage
   };
 
   return (
