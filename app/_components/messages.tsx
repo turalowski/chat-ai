@@ -70,13 +70,13 @@ export default function Messages() {
                                 </AvatarFallback>
                             </Avatar>
                             <div
-                                className={`border border-gray-200 rounded-md p-3`}
+                                className={`border grow border-gray-200 rounded-md p-3`}
                             >
                                 <ReactMarkdown>{message.message}</ReactMarkdown>
                                 <Accordion
                                     type="single"
                                     collapsible
-                                    className="w-full"
+                                    className="max-w-full w-full"
                                 >
                                     {message.sourceDocs.map(
                                         (sourceDoc, index) => (
@@ -89,7 +89,7 @@ export default function Messages() {
                                                         Reference {index + 1}
                                                     </Button>
                                                 </AccordionTrigger>
-                                                <AccordionContent>
+                                                <AccordionContent className="max-w-full text-wrap break-words">
                                                     {sourceDoc.pageContent}
                                                     {sourceDoc.metadata
                                                         .pageNumber && (

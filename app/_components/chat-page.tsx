@@ -33,16 +33,18 @@ const ChatPage = async ({
                         {menu === 'group' && <SidebarGroups />}
                     </SidebarNav>
                 </div>
-                {documentPath && (
-                    <div className="flex grow w-full">
-                        <PreviewPdf documentPath={documentPath} />
+                <div className="grow w-full flex gap-3">
+                    {documentPath && (
+                        <div className="flex  grow w-full">
+                            <PreviewPdf documentPath={documentPath} />
+                        </div>
+                    )}
+                    <div className="flex gap-3 grow w-full flex-col">
+                        <Messages />
+                        <Suggestions />
+                        <NewMessage />
+                        <ErrorAlert />
                     </div>
-                )}
-                <div className="flex gap-3 w-[1400px] flex-col">
-                    <Messages />
-                    <Suggestions />
-                    <NewMessage />
-                    <ErrorAlert />
                 </div>
             </div>
         </main>

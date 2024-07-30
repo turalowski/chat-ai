@@ -59,6 +59,7 @@ const PreviewPdf: React.FC<PreviewPdfProps> = ({ documentPath }) => {
             type="application/pdf"
             width="100%"
             height="100%"
+            className="w-full"
         ></object>
     )
 }
