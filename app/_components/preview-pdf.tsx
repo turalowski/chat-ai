@@ -24,7 +24,6 @@ type PreviewPdfProps = {
 
 const PreviewPdf: React.FC<PreviewPdfProps> = ({ documentPath }) => {
   const { setPage, page } = useAppContext()
-  console.log('page', page)
   const [file, setFile] = useState<null | string>(null)
   // Function to handle successful loading of the PDF document
 
@@ -39,8 +38,6 @@ const PreviewPdf: React.FC<PreviewPdfProps> = ({ documentPath }) => {
           throw new Error('Could not find the document')
         }
         const url = URL.createObjectURL(documentAsBlob as Blob)
-        console.log(url)
-
         setFile(`${url}`)
       }
     }

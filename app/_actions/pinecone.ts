@@ -173,13 +173,6 @@ export async function storeDocumentVectors(
     // Add document to database and update user documents
     const documentId = await addDocumentToDatabse(documentPath, documentName)
     await updateUserDocuments(documentId)
-
-    var endTime = new Date().getTime()
-
-    // Calculate the elapsed time
-    var elapsedTime = endTime - startTime
-
-    console.log('Processing time: ' + elapsedTime + ' milliseconds')
     // Return success message
     return {
       message: 'Success',
