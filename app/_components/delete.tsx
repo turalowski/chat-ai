@@ -48,7 +48,7 @@ export function Delete({
       })
     } catch (error: unknown) {
       if (error instanceof Error) {
-        console.log('Delete document error: ', error.message)
+        console.error('Delete document error: ', error.message)
         toast({
           title: 'Failed to delete the document',
         })

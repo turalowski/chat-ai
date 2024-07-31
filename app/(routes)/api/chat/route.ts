@@ -34,7 +34,6 @@ export async function POST(req: Request) {
     }
 
     if (groupId) {
-      console.log('group groupId', groupId)
       // Create a client instance for Supabase
       const supabase = createClient()
       // Retrieve the currently authenticated user
@@ -65,9 +64,6 @@ export async function POST(req: Request) {
         throw new Error('User id is missing')
       }
     }
-
-    console.log('testtt', documentPaths)
-
     /* Connect to the Pinecone vector store with the specified index, embedding model, and configurations */
     const vectorStore = await PineconeStore.fromExistingIndex(
       new OpenAIEmbeddings({}),
@@ -113,7 +109,6 @@ export async function POST(req: Request) {
     })
     /* Await the resolution of document retrieval */
     const sourceDocuments = await documentPromise
-    console.log('surceDocuments', sourceDocuments)
     /* Return the response along with source documents with a 200 status code */
     return Response.json(
       { text: response, sourceDocuments: JSON.stringify(sourceDocuments) },

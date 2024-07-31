@@ -36,7 +36,6 @@ export default function Messages() {
   }, [group_id, document_id, menu])
 
   useEffect(() => {
-    console.log('messages', messages)
     messageListRef.current?.scrollTo(0, messageListRef.current.scrollHeight)
   }, [messages])
 
