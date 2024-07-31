@@ -1,45 +1,43 @@
-'use client';
+'use client'
 
-import { Delete } from './delete';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useTransition } from 'react';
-import { Spinner } from './spinner';
-import { File } from 'lucide-react';
-import clsx from 'clsx';
+import { Delete } from './delete'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useTransition } from 'react'
+import { Spinner } from './spinner'
+import { File } from 'lucide-react'
+import clsx from 'clsx'
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   document: {
-    id: number;
-    path: string;
-    name: string;
-  };
+    id: number
+    path: string
+    name: string
+  }
 }
 
 export function SidebarFile({ document }: SidebarNavProps) {
-  const { id, name, path } = document;
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const router = useRouter();
-  const [isFileLoading, startTransition] = useTransition();
+  const { id, name, path } = document
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+  const router = useRouter()
+  const [isFileLoading, startTransition] = useTransition()
 
-  const params = new URLSearchParams(
-    searchParams as unknown as URLSearchParams
-  );
+  const params = new URLSearchParams(searchParams as unknown as URLSearchParams)
 
-  const selectedDocumentId = params.get('document_id');
+  const selectedDocumentId = params.get('document_id')
 
   const onFileClick = (documentId: string) => {
     if (isFileLoading) {
-      return;
+      return
     }
     startTransition(() => {
-      const params = new URLSearchParams(searchParams);
-      params.set('document_id', documentId);
+      const params = new URLSearchParams(searchParams)
+      params.set('document_id', documentId)
       router.replace(`${pathname}?${params.toString()}`, {
         scroll: false,
-      });
-    });
-  };
+      })
+    })
+  }
 
   return (
     <div
@@ -60,5 +58,5 @@ export function SidebarFile({ document }: SidebarNavProps) {
         documentPath={path}
       />
     </div>
-  );
+  )
 }

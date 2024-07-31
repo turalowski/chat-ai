@@ -1,57 +1,55 @@
-'use client';
+'use client'
 
-import { cn } from '@/app/_lib/utils';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useTransition } from 'react';
-import { FileIcon, FolderIcon, LogOut } from 'lucide-react';
-import { Button } from './ui/button';
-import { logout } from '../_actions/auth';
-import { Spinner } from './spinner';
+import { cn } from '@/app/_lib/utils'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useTransition } from 'react'
+import { FileIcon, FolderIcon, LogOut } from 'lucide-react'
+import { Button } from './ui/button'
+import { logout } from '../_actions/auth'
+import { Spinner } from './spinner'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/app/_components/ui/tooltip';
+} from '@/app/_components/ui/tooltip'
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
-  email: string;
+  email: string
 }
 
 export function Menu({ email, className, ...props }: SidebarNavProps) {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
 
-  const params = new URLSearchParams(
-    searchParams as unknown as URLSearchParams
-  );
+  const params = new URLSearchParams(searchParams as unknown as URLSearchParams)
 
-  const menu = params.get('menu');
+  const menu = params.get('menu')
 
   const updateMenu = (newMenu: string) => {
     if (menu !== newMenu) {
       startTransition(() => {
-        const params = new URLSearchParams(searchParams);
-        params.delete('group_id');
-        params.delete('file_id');
-        params.set('menu', newMenu);
+        const params = new URLSearchParams(searchParams)
+        params.delete('group_id')
+        params.delete('file_id')
+        params.set('menu', newMenu)
         router.replace(`${pathname}?${params.toString()}`, {
           scroll: false,
-        });
-      });
+        })
+      })
     }
-  };
+  }
 
-  const onFileClick = () => updateMenu('file');
-  const onGroupClick = () => updateMenu('group');
+  const onFileClick = () => updateMenu('file')
+  const onGroupClick = () => updateMenu('group')
 
   const handleLogout = () => {
     startTransition(() => {
-      logout();
-    });
-  };
+      logout()
+    })
+  }
   return (
     <nav
       className={cn(
@@ -107,5 +105,5 @@ export function Menu({ email, className, ...props }: SidebarNavProps) {
         </TooltipProvider>
       </div>
     </nav>
-  );
+  )
 }

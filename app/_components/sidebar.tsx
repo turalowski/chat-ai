@@ -1,7 +1,7 @@
-import clsx from 'clsx';
+import clsx from 'clsx'
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 export function SidebarNav({ children, className, ...props }: SidebarNavProps) {
@@ -18,5 +18,5 @@ export function SidebarNav({ children, className, ...props }: SidebarNavProps) {
     >
       {children}
     </nav>
-  );
+  )
 }

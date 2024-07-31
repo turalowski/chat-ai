@@ -1,31 +1,25 @@
-'use client';
+'use client'
 
-import { useRef } from 'react';
-import { ReloadIcon } from '@radix-ui/react-icons';
-import { Button } from '@/app/_components/ui/button';
-import { Input } from '@/app/_components/ui/input';
-import { SendHorizonalIcon } from 'lucide-react';
-import { useAppContext } from '@/app/_context/Chat';
-import { useSearchParams } from 'next/navigation';
-import useChat from '../_hooks/useChat';
+import { useRef } from 'react'
+import { ReloadIcon } from '@radix-ui/react-icons'
+import { Button } from '@/app/_components/ui/button'
+import { Input } from '@/app/_components/ui/input'
+import { SendHorizonalIcon } from 'lucide-react'
+import { useAppContext } from '@/app/_context/Chat'
+import { useSearchParams } from 'next/navigation'
+import useChat from '../_hooks/useChat'
 
 export default function NewMessage() {
-  const {
-    query,
-    setQuery,
-    loading,
-  } = useAppContext();
-  const { handleSubmit } = useChat();
-  const searchParams = useSearchParams();
+  const { query, setQuery, loading } = useAppContext()
+  const { handleSubmit } = useChat()
+  const searchParams = useSearchParams()
 
-  const params = new URLSearchParams(
-    searchParams as unknown as URLSearchParams
-  );
+  const params = new URLSearchParams(searchParams as unknown as URLSearchParams)
 
-  const selectedDocumentPath = params.get('document_id');
-  const groupId = params.get('group_id');
+  const selectedDocumentPath = params.get('document_id')
+  const groupId = params.get('group_id')
 
-  const textAreaRef = useRef<HTMLInputElement>(null);
+  const textAreaRef = useRef<HTMLInputElement>(null)
 
   return (
     <form className="w-full flex gap-3" onSubmit={handleSubmit}>
@@ -41,7 +35,7 @@ export default function NewMessage() {
           loading ? 'Waiting for response...' : 'Describe this document.'
         }
         value={query}
-        onChange={e => setQuery(e.target.value)}
+        onChange={(e) => setQuery(e.target.value)}
       />
       <Button
         type="submit"
@@ -54,5 +48,5 @@ export default function NewMessage() {
         )}
       </Button>
     </form>
-  );
+  )
 }
