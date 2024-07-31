@@ -1,59 +1,57 @@
-'use client';
+'use client'
 
-import { FolderIcon, TrashIcon } from 'lucide-react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useTransition } from 'react';
-import { Spinner } from './spinner';
-import clsx from 'clsx';
-import { deleteGroup } from '../_actions/groups';
-import { toast } from './ui/use-toast';
+import { FolderIcon, TrashIcon } from 'lucide-react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useTransition } from 'react'
+import { Spinner } from './spinner'
+import clsx from 'clsx'
+import { deleteGroup } from '../_actions/groups'
+import { toast } from './ui/use-toast'
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   group: {
-    id: number;
-    name: string;
-    docuemnt_ids: string[];
-    user_id: string;
-  };
+    id: number
+    name: string
+    docuemnt_ids: string[]
+    user_id: string
+  }
 }
 
 export function SidebarGroup({ group, className, ...props }: SidebarNavProps) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
 
-  const params = new URLSearchParams(
-    searchParams as unknown as URLSearchParams
-  );
+  const params = new URLSearchParams(searchParams as unknown as URLSearchParams)
 
-  const selectedGroup = params.get('group_id');
+  const selectedGroup = params.get('group_id')
 
   const onGroupClick = () => {
     if (!isPending && selectedGroup !== String(group.id)) {
       startTransition(() => {
-        const params = new URLSearchParams(searchParams);
-        params.set('group_id', String(group.id));
-        params.delete('document_id');
+        const params = new URLSearchParams(searchParams)
+        params.set('group_id', String(group.id))
+        params.delete('document_id')
         router.replace(`${pathname}?${params.toString()}`, {
           scroll: false,
-        });
-      });
+        })
+      })
     }
-  };
+  }
 
   const handleDeleteClick = (id: string) => {
     startTransition(async () => {
-      await deleteGroup(id);
+      await deleteGroup(id)
       if (selectedGroup === id) {
-        params.delete('group_id');
+        params.delete('group_id')
       }
-      router.refresh();
+      router.refresh()
       toast({
         title: 'Deleted group',
-      });
-    });
-  };
+      })
+    })
+  }
 
   return (
     <div
@@ -71,11 +69,11 @@ export function SidebarGroup({ group, className, ...props }: SidebarNavProps) {
       <TrashIcon
         size={14}
         color="red"
-        onClick={event => {
-          event.stopPropagation();
-          handleDeleteClick(String(group.id));
+        onClick={(event) => {
+          event.stopPropagation()
+          handleDeleteClick(String(group.id))
         }}
       />
     </div>
-  );
+  )
 }

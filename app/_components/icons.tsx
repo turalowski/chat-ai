@@ -1,6 +1,6 @@
-import { SVGProps } from 'react';
+import { SVGProps } from 'react'
 
-export const TrashIcon: React.FC<SVGProps<SVGSVGElement>> = ({...rest}) => (
+export const TrashIcon: React.FC<SVGProps<SVGSVGElement>> = ({ ...rest }) => (
   <svg
     width="16"
     height="16"
@@ -14,4 +14,4 @@ export const TrashIcon: React.FC<SVGProps<SVGSVGElement>> = ({...rest}) => (
       fill="#FF716A"
     />
   </svg>
-);
+)

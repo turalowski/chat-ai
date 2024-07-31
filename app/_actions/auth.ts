@@ -1,28 +1,28 @@
-'use server';
+'use server'
 
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
-import { createClient } from '@/app/_utils/supabase/server';
+import { createClient } from '@/app/_utils/supabase/server'
 
 export async function login(email: string, password: string) {
-  const supabase = createClient();
+  const supabase = createClient()
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
 
   if (error) {
-    redirect(`/login?status=${error.name}&message=${error.message}`);
+    redirect(`/login?status=${error.name}&message=${error.message}`)
   } else {
-    revalidatePath('/');
-    redirect('/');
+    revalidatePath('/')
+    redirect('/')
   }
 }
 
 export async function signup(email: string, password: string) {
-  const supabase = createClient();
+  const supabase = createClient()
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
@@ -30,7 +30,7 @@ export async function signup(email: string, password: string) {
   const response = await supabase.auth.signUp({
     email,
     password,
-  });
+  })
 
   if (response.data && response.data.user) {
     // Check if the user got created
@@ -38,25 +38,25 @@ export async function signup(email: string, password: string) {
       response.data.user.identities &&
       response.data.user.identities.length > 0
     ) {
-      redirect(`/login?message=${encodeURI('Please check your mailbox')}`);
+      redirect(`/login?message=${encodeURI('Please check your mailbox')}`)
     } else {
       redirect(
         `/sign-up?message=${encodeURI('Email address is already taken')}`
-      );
+      )
     }
   }
 }
 
 export async function logout() {
-  const supabase = createClient();
+  const supabase = createClient()
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
 
-  const { error } = await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut()
 
   if (error) {
-    redirect(`/login?status=${error.name}`);
+    redirect(`/login?status=${error.name}`)
   }
-  redirect('/login');
+  redirect('/login')
 }

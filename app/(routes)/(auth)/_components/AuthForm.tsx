@@ -1,9 +1,9 @@
-'use client';
+'use client'
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Button } from '@/app/_components/ui/button';
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { Button } from '@/app/_components/ui/button'
 import {
   Form,
   FormControl,
@@ -11,50 +11,50 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/app/_components/ui/form';
-import { Input } from '@/app/_components/ui/input';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Alert, AlertDescription, AlertTitle } from '@/app/_components/ui/alert';
-import { ReloadIcon } from '@radix-ui/react-icons';
-import { useState } from 'react';
+} from '@/app/_components/ui/form'
+import { Input } from '@/app/_components/ui/input'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Alert, AlertDescription, AlertTitle } from '@/app/_components/ui/alert'
+import { ReloadIcon } from '@radix-ui/react-icons'
+import { useState } from 'react'
 
 const Messages: {
-  [key: string]: string;
+  [key: string]: string
 } = {
   EmailSent: 'Please check your mailbox',
   SignUpSuccess: 'Please enter your credentials to log in',
-} as const;
+} as const
 
 const formSchema = z.object({
   email: z.string().email(),
   password: z.string().min(2).max(50),
-});
+})
 
 export function AuthForm({
   submitButtonLabel,
   handleSubmit,
 }: {
-  submitButtonLabel: string;
-  handleSubmit: Function;
+  submitButtonLabel: string
+  handleSubmit: Function
 }) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [loading, setLoading] = useState(false);
-  const message = searchParams.get('message') as string;
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [loading, setLoading] = useState(false)
+  const message = searchParams.get('message') as string
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
       password: '',
     },
-  });
+  })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      setLoading(true);
-      const response = await handleSubmit(values.email, values.password);
+      setLoading(true)
+      const response = await handleSubmit(values.email, values.password)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
@@ -118,7 +118,7 @@ export function AuthForm({
             onClick={() => {
               submitButtonLabel === 'Login'
                 ? router.push('sign-up')
-                : router.push('login');
+                : router.push('login')
             }}
             className="text-blue-700"
             variant="link"
@@ -133,5 +133,5 @@ export function AuthForm({
         )}
       </nav>
     </main>
-  );
+  )
 }
