@@ -22,18 +22,11 @@ interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   }[]
 }
 
-export function AddFile({ documents, className, ...props }: SidebarNavProps) {
+export function AddFile({ className, ...props }: SidebarNavProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
-  const [dynamicDocuments, setDynamicDocuments] = useState(
-    documents.map((document) => ({ ...document, selected: false }))
-  )
   const searchParams = useSearchParams()
   const pathname = usePathname()
-
-  const selectedDocuments = dynamicDocuments.filter(
-    (dynamicDocument) => dynamicDocument.selected
-  )
 
   async function handleUploadClick(file: File) {
     startTransition(async () => {
