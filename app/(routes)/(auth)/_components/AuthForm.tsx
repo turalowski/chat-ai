@@ -1,9 +1,9 @@
-'use client'
+'use client';
 
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { Button } from '@/app/_components/ui/button'
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/app/_components/ui/button';
 import {
   Form,
   FormControl,
@@ -11,52 +11,61 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/app/_components/ui/form'
-import { Input } from '@/app/_components/ui/input'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Alert, AlertDescription, AlertTitle } from '@/app/_components/ui/alert'
-import { ReloadIcon } from '@radix-ui/react-icons'
-import { useState } from 'react'
+} from '@/app/_components/ui/form';
+import { Input } from '@/app/_components/ui/input';
+import { useRouter, useSearchParams } from 'next/navigation';
+import {
+  Alert,
+  AlertDescription,
+} from '@/app/_components/ui/alert';
+import { ReloadIcon } from '@radix-ui/react-icons';
+import { useState, useCallback } from 'react';
 
-const Messages: {
-  [key: string]: string
-} = {
+const Messages = {
   EmailSent: 'Please check your mailbox',
   SignUpSuccess: 'Please enter your credentials to log in',
-} as const
+  AuthRetryableFetchError: 'Internal server error',
+} as const;
 
 const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(2).max(50),
-})
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters').max(50, 'Password must not exceed 50 characters'),
+});
 
-export function AuthForm({
-  submitButtonLabel,
-  handleSubmit,
-}: {
-  submitButtonLabel: string
-  handleSubmit: Function
-}) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [loading, setLoading] = useState(false)
-  const message = searchParams.get('message') as string
-  const form = useForm<z.infer<typeof formSchema>>({
+type FormValues = z.infer<typeof formSchema>;
+
+interface AuthFormProps {
+  submitButtonLabel: string;
+  handleSubmit: (email: string, password: string) => Promise<void>;
+}
+
+export function AuthForm({ submitButtonLabel, handleSubmit }: AuthFormProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [loading, setLoading] = useState(false);
+  const status = searchParams.get('status');
+  const message = searchParams.get('message');
+
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
       password: '',
     },
-  })
+  });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = useCallback(async (values: FormValues) => {
     try {
-      setLoading(true)
-      const response = await handleSubmit(values.email, values.password)
+      setLoading(true);
+      await handleSubmit(values.email, values.password);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  }, [handleSubmit]);
+
+  const toggleAuthMode = useCallback(() => {
+    router.push(submitButtonLabel === 'Login' ? 'sign-up' : 'login');
+  }, [router, submitButtonLabel]);
 
   return (
     <main className="flex flex-col items-center justify-center">
@@ -99,7 +108,7 @@ export function AuthForm({
             <div className="flex items-center justify-center">
               <Button
                 type="submit"
-                className="w-full flex items-center gap-3"
+                className="w-full flex items-center justify-center gap-3"
                 disabled={loading}
               >
                 {loading && <ReloadIcon className="h-4 w-4 animate-spin" />}
@@ -108,30 +117,26 @@ export function AuthForm({
             </div>
           </form>
         </Form>
-        <div className="text-sm text-center">
+        <div className="text-sm text-center mt-4">
           <span>
             {submitButtonLabel === 'Login'
-              ? "You don't have an account yet?"
+              ? "Don't have an account yet?"
               : 'Already have an account?'}
           </span>
           <Button
-            onClick={() => {
-              submitButtonLabel === 'Login'
-                ? router.push('sign-up')
-                : router.push('login')
-            }}
-            className="text-blue-700"
+            onClick={toggleAuthMode}
+            className="text-blue-700 ml-2"
             variant="link"
           >
             {submitButtonLabel === 'Login' ? 'Sign up' : 'Login'}
           </Button>
         </div>
-        {message && (
-          <Alert variant="default">
-            {message && <AlertDescription>{message}</AlertDescription>}
+        {(message || status) && (
+          <Alert variant="default" className="mt-4">
+            <AlertDescription>{Messages[status as keyof typeof Messages] || message}</AlertDescription>
           </Alert>
         )}
       </nav>
     </main>
-  )
+  );
 }
