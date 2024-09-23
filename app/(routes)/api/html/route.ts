@@ -6,7 +6,6 @@ import chromium from 'chrome-aws-lambda';
 export async function POST(request: NextRequest) {
   let browser: Browser | CoreBrowser;
   if (process.env.NODE_ENV === 'production') {
-    const puppeteer = await import('puppeteer-core');
     browser = await chromium.puppeteer.launch({
       args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
       defaultViewport: chromium.defaultViewport,
