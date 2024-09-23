@@ -12,13 +12,7 @@ export async function POST(request: NextRequest) {
   ];
 
   const browser = await puppeteer.launch({
-    ...(isLocal
-      ? { channel: 'chrome' }
-      : {
-          args: chromeArgs,
-          executablePath: await chromium.executablePath(),
-          ignoreHTTPSErrors: true,
-        }),
+    channel: 'chrome',
   });
 
   try {
