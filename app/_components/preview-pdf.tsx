@@ -1,7 +1,5 @@
 'use client'
 
-import { Document, Page } from 'react-pdf'
-import { pdfjs } from 'react-pdf'
 
 /* These styles are required to avoid duplicate page rendering*/
 import 'react-pdf/dist/esm/Page/TextLayer.css'
@@ -9,12 +7,6 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css'
 import { useEffect, useState } from 'react'
 import { createClient } from '../_utils/supabase/client'
 import { useAppContext } from '../_context/Chat'
-
-/* This configuration is required to make the pdf worker work*/
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.js',
-  import.meta.url
-).toString()
 
 // Props definition for PreviewPdf component
 type PreviewPdfProps = {
