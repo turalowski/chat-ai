@@ -1,43 +1,62 @@
 import { NextRequest, NextResponse } from 'next/server';
-import puppeteer from 'puppeteer';
+import chromium from '@sparticuz/chromium-min';
+import puppeteer, { Browser } from 'puppeteer';
 
 export async function POST(request: NextRequest) {
-  let { url } = await request.json();
+  // Keep in memory for possible re-use between innovations
+  const isLocal = false; // Set this variable as required - @sparticuz/chromium does not work on ARM, so we use a standard Chrome executable locally - see issue https://github.com/Sparticuz/chromium/issues/186
 
-  if (!url) {
-    return NextResponse.json({ error: 'URL is required' }, { status: 400 });
-  }
+  const chromeArgs = [
+    // @sparticuz/chromium has default chromeArgs to improve serverless performance, but you can add others as you deem appropriate
+    '--font-render-hinting=none', // Improves font-rendering quality and spacing
+  ];
 
-  if (!url.startsWith('http://') && !url.startsWith('https://')) {
-    url = 'https://' + url;
-  }
-
-  const browser = await puppeteer.launch({headless: 'new'});
-  const page = await browser.newPage();
+  const browser = await puppeteer.launch({
+    ...(isLocal
+      ? { channel: 'chrome' }
+      : {
+          args: chromeArgs,
+          executablePath: await chromium.executablePath(),
+          ignoreHTTPSErrors: true,
+        }),
+  });
 
   try {
+    let { url } = await request.json();
+
+    if (!url) {
+      return NextResponse.json({ error: 'URL is required' }, { status: 400 });
+    }
+
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+
+    const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 60000 });
-    
 
     const pdfBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,
-      margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' }
+      margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' },
     });
-
-    await browser.close();
 
     return new NextResponse(pdfBuffer, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': 'attachment; filename=converted.pdf'
-      }
+        'Content-Disposition': 'attachment; filename=converted.pdf',
+      },
     });
-
   } catch (error) {
     console.error('Error converting HTML to PDF:', error);
-    await browser.close();
-    return NextResponse.json({ error: 'Failed to convert HTML to PDF' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to convert HTML to PDF' },
+      { status: 500 }
+    );
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
   }
 }
