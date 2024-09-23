@@ -1,30 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import * as puppeteer from 'puppeteer';
-import chromium from '@sparticuz/chromium';
-import puppeteerCore from 'puppeteer-core';
+import { Browser } from 'puppeteer';
+import { Browser as CoreBrowser } from 'puppeteer-core';
+import chromium from '@sparticuz/chromium-min';
 
 export async function POST(request: NextRequest) {
-  let browser = null;
-
-  if (process.env.NODE_ENV === 'development') {
-    browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      headless: true,
-    });
-  }
+  let browser: Browser | CoreBrowser;
   if (process.env.NODE_ENV === 'production') {
-    const executablePath = await chromium.executablePath();
-    if (!executablePath) {
-      return NextResponse.json(
-        { error: 'Chromium executable path not found' },
-        { status: 500 }
-      );
-    }
-    browser = await puppeteerCore.launch({
+    const puppeteer = await import('puppeteer-core');
+    browser = await puppeteer.launch({
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
-      executablePath: executablePath,
+      executablePath: await chromium.executablePath(),
       headless: true,
+    });
+  } else {
+    const puppeteer = await import('puppeteer');
+    browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      headless: 'new',
     });
   }
 
@@ -39,8 +32,8 @@ export async function POST(request: NextRequest) {
       url = 'https://' + url;
     }
 
-    if(!browser) {
-      throw new Error("Browser doesn't work")
+    if (!browser) {
+      throw new Error("Browser doesn't work");
     }
 
     const page = await browser.newPage();
