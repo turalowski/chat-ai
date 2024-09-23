@@ -13,11 +13,18 @@ export async function POST(request: NextRequest) {
     });
   }
   if (process.env.NODE_ENV === 'production') {
+    const executablePath = await chromium.executablePath();
+    if (!executablePath) {
+      return NextResponse.json(
+        { error: 'Chromium executable path not found' },
+        { status: 500 }
+      );
+    }
     browser = await puppeteerCore.launch({
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: false,
+      executablePath: executablePath,
+      headless: true,
     });
   }
 
