@@ -2,8 +2,6 @@
 
 
 /* These styles are required to avoid duplicate page rendering*/
-import 'react-pdf/dist/esm/Page/TextLayer.css'
-import 'react-pdf/dist/esm/Page/AnnotationLayer.css'
 import { useEffect, useState } from 'react'
 import { createClient } from '../_utils/supabase/client'
 import { useAppContext } from '../_context/Chat'
