@@ -19,6 +19,8 @@ const isLocal = !!process.env.CHROME_EXECUTABLE_PATH;
   try {
     await page.setViewport({ width: 1920, height: 1080 });
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 90000 });
+    // Add a delay of 5 seconds to allow for any dynamic content to load
+    await new Promise(resolve => setTimeout(resolve, 5000));
     // Scroll to bottom and back to top to ensure all lazy-loaded content is rendered
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page.evaluate(() => window.scrollTo(0, 0));
