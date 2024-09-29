@@ -2,7 +2,7 @@ import { convertHtmlToPdf } from '@/app/_actions/html';
 import { NextRequest, NextResponse } from 'next/server';
 
 //  Please do pay attention to how long your API requests run as it may run up your bill or may make you eventually actually have a bill.
-export const maxDuration = 50;
+export const maxDuration = 300
 
 export async function POST(request: NextRequest) {
   try {
