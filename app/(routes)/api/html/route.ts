@@ -1,26 +1,7 @@
+import { convertHtmlToPdf } from '@/app/_actions/html';
 import { NextRequest, NextResponse } from 'next/server';
-import { Browser } from 'puppeteer';
-import { Browser as CoreBrowser } from 'puppeteer-core';
-import chromium from 'chrome-aws-lambda';
 
 export async function POST(request: NextRequest) {
-  let browser: Browser | CoreBrowser;
-  if (process.env.NODE_ENV === 'production') {
-    browser = await chromium.puppeteer.launch({
-      args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath,
-      headless: true,
-      ignoreHTTPSErrors: true,
-    })
-  } else {
-    const puppeteer = await import('puppeteer');
-    browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      headless: 'new',
-    });
-  }
-
   try {
     let { url } = await request.json();
 
@@ -32,20 +13,9 @@ export async function POST(request: NextRequest) {
       url = 'https://' + url;
     }
 
-    if (!browser) {
-      throw new Error("Browser doesn't work");
-    }
+    const buffer = await convertHtmlToPdf(url);
 
-    const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'networkidle0', timeout: 60000 });
-
-    const pdfBuffer = await page.pdf({
-      format: 'a4',
-      printBackground: true,
-      margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' },
-    });
-
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(buffer, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
@@ -58,9 +28,5 @@ export async function POST(request: NextRequest) {
       { error: 'Failed to convert HTML to PDF' },
       { status: 500 }
     );
-  } finally {
-    if (browser) {
-      await browser.close();
-    }
   }
 }
