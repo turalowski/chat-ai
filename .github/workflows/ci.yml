@@ -25,7 +25,6 @@ jobs:
           # The build only needs these to be set: it makes no calls to these services.
           NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:55321
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
-          OPENAI_API_KEY: placeholder
           PINECONE_API_KEY: placeholder
           PINECONE_ENVIRONMENT: placeholder
           PINECONE_INDEX_NAME: placeholder

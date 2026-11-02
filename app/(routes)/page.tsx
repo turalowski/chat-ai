@@ -3,7 +3,11 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/app/_utils/supabase/server'
 import { AppProvider } from '../_context/Chat'
 
-export const maxDuration = 300 // Applies to the actions
+// Please do pay attention to how long your API requests
+// run as it may run up your bill or may make you eventually
+// actually have a bill. Free version of Vercel has 60
+// seconds max duration.
+export const maxDuration = 60
 
 export default async function Home({
   searchParams,

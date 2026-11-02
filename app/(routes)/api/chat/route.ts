@@ -1,7 +1,7 @@
 import type { Document } from 'langchain/document'
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
 import { PineconeStore } from '@langchain/pinecone'
 import { z } from 'zod'
+import { VoyageEmbeddings } from '@/app/_utils/embeddings'
 import { makeChain } from '@/app/_utils/makechain'
 import { pinecone } from '@/app/_utils/pinecone-client'
 import { createClient } from '@/app/_utils/supabase/server'
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     }
     const { question, history, documentPath, groupId } = body.data
 
-    /* Sanitize the question by replacing newlines with spaces as recommended by OpenAI */
+    /* Sanitize the question by replacing newlines with spaces */
     const sanitizedQuestion = question.replaceAll('\n', ' ')
     /* Initialize the Pinecone index with the given index name */
     const index = pinecone.Index(PINECONE_INDEX_NAME)
@@ -75,7 +75,7 @@ export async function POST(req: Request) {
 
     /* Connect to the Pinecone vector store with the specified index, embedding model, and configurations */
     const vectorStore = await PineconeStore.fromExistingIndex(
-      new OpenAIEmbeddings({}),
+      new VoyageEmbeddings(),
       {
         pineconeIndex: index,
         textKey: 'text',

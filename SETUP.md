@@ -6,8 +6,9 @@ The app can run against Supabase in Docker, which needs no account, or against a
 
 - Docker
 - Node.js 20
-- An [OpenAI](https://platform.openai.com) API key
-- A [Pinecone](https://www.pinecone.io) index with 1536 dimensions
+- An [Anthropic](https://platform.claude.com) API key, for answers
+- A [Voyage AI](https://www.voyageai.com) API key, for embeddings
+- A [Pinecone](https://www.pinecone.io) index with 1024 dimensions and the cosine metric
 
 ## Run with Supabase in Docker
 
@@ -94,7 +95,8 @@ Local Supabase catches every email in this inbox and sends nothing to real addre
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase API URL. |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key. |
-| `OPENAI_API_KEY` | OpenAI API key, used for embeddings and answers |
+| `ANTHROPIC_API_KEY` | Anthropic API key, used for answers |
+| `VOYAGE_API_KEY` | Voyage AI API key, used for embeddings |
 | `PINECONE_API_KEY` | Pinecone API key |
 | `PINECONE_INDEX_NAME` | Name of your Pinecone index |
 | `PINECONE_ENVIRONMENT` | Must not be empty, because the app checks for it at startup. Any value works |

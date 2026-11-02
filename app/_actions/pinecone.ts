@@ -2,7 +2,7 @@
 
 import { createClient } from '@/app/_utils/supabase/server'
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
-import { OpenAIEmbeddings } from '@langchain/openai'
+import { VoyageEmbeddings } from '@/app/_utils/embeddings'
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf'
 import { Pinecone } from '@pinecone-database/pinecone'
 
@@ -58,7 +58,7 @@ export async function storeDocumentVectors(
     /* Applying the text splitter to the processed PDF document */
     const documentChunks = await textSplitter.splitDocuments(pdfDocument)
     /* Create and store the embeddings in the vectorStore */
-    const embeddings = new OpenAIEmbeddings()
+    const embeddings = new VoyageEmbeddings()
     const index = pinecone.index(PINECONE_INDEX_NAME)
     /* Embed the PDF documents and collect vector IDs */
     const itemsToUpsert = []
