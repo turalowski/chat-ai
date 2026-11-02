@@ -4,8 +4,10 @@ import { UnsafeUrlError } from '@/app/_utils/url-safety'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
-//  Please do pay attention to how long your API requests run as it may run up your bill or may make you eventually actually have a bill.
-export const maxDuration = 300
+//  Please do pay attention to how long your API requests
+// run as it may run up your bill or may make you eventually
+// actually have a bill. Free version of Vercel has 60 seconds max duration.
+export const maxDuration = 60
 
 const bodySchema = z.object({ url: z.string().trim().min(1).max(2048) })
 

@@ -83,8 +83,6 @@ export function AddHtml({ className }: SidebarNavProps) {
           type: 'application/pdf',
         });
 
-        console.log('file', file)
-
         // Upload the PDF file
         const documentPath = await uploadDocument(file)
 

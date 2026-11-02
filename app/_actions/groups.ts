@@ -17,7 +17,7 @@ export async function getGroups() {
     .from('document_groups')
     .select()
     .returns<
-      { id: number; name: string; docuemnt_ids: string[]; user_id: string }[]
+      { id: number; name: string; document_paths: string[]; user_id: string }[]
     >()
 
   if (error) {

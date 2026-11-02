@@ -45,6 +45,10 @@ These use the `553xx` range so they don't clash with other Supabase projects on 
 | `npm run db:stop` | Stops Supabase and keeps the data |
 | `npm run db:reset` | Deletes all local data and reapplies the migrations |
 
+### Tests
+
+With local Supabase running, `npm run test:rls` tries to break the access rules using two users and an anonymous client. It refuses to run against a hosted project, and leaves its test users in the local database until the next `npm run db:reset`.
+
 ## How registration works
 
 | | Supabase in Docker | Hosted Supabase |

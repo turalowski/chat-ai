@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+        env:
+          # The build only needs these to be set: it makes no calls to these services.
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:55321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
+          OPENAI_API_KEY: placeholder
+          PINECONE_API_KEY: placeholder
+          PINECONE_ENVIRONMENT: placeholder
+          PINECONE_INDEX_NAME: placeholder
+
+  row-level-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run db:start
+      - name: Write local Supabase keys to .env.local
+        run: >
+          npx --yes supabase@2.122.0 status -o env
+          --override-name api.url=NEXT_PUBLIC_SUPABASE_URL
+          --override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_ANON_KEY
+          > .env.local
+      - run: npm run test:rls

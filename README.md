@@ -1,3 +1,5 @@
+[![CI](https://github.com/turalowski/chat-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/turalowski/chat-ai/actions/workflows/ci.yml)
+
 ## Setup
 
 See [SETUP.md](SETUP.md) to run the project with Supabase in Docker or on a hosted project.

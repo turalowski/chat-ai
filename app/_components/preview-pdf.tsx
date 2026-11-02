@@ -8,7 +8,6 @@ import { useAppContext } from '../_context/Chat'
 
 // Props definition for PreviewPdf component
 type PreviewPdfProps = {
-  setTotalPages?: Function // Optional function to set the total number of pages
   documentPath: string | undefined
 }
 

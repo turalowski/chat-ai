@@ -14,7 +14,6 @@ export async function storeDocumentVectors(
   documentPath: string,
   documentName: string
 ) {
-  var startTime = new Date().getTime()
   try {
     // Create a Supabase client instance
     const client = createClient()
@@ -60,8 +59,7 @@ export async function storeDocumentVectors(
     const documentChunks = await textSplitter.splitDocuments(pdfDocument)
     /* Create and store the embeddings in the vectorStore */
     const embeddings = new OpenAIEmbeddings()
-    const index =
-      pinecone.index(PINECONE_INDEX_NAME) /* Change to your own index name */
+    const index = pinecone.index(PINECONE_INDEX_NAME)
     /* Embed the PDF documents and collect vector IDs */
     const itemsToUpsert = []
     // Embed the PDF documents and collect vector IDs
