@@ -7,8 +7,7 @@ import { Label } from './ui/label'
 import { useState, useTransition } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { ReloadIcon } from '@radix-ui/react-icons'
-import { createClient } from '../_utils/supabase/client'
-import { v4 } from 'uuid'
+import { uploadDocument } from '../_utils/upload-document'
 import { storeDocumentVectors } from '../_actions/pinecone'
 import { toast } from './ui/use-toast'
 
@@ -30,31 +29,20 @@ export function AddFile({ className, ...props }: SidebarNavProps) {
 
   async function handleUploadClick(file: File) {
     startTransition(async () => {
-      // Create a client instance
-      const client = createClient()
       // Check if a file is selected
       if (!file) {
         throw new Error('You need to upload a file first')
       }
       try {
         /* Upload document to Supabase Storage */
-        const { data: documentData, error: documentError } =
-          await client.storage.from('documents').upload(v4(), file)
-        // Throw error if upload fails
-        if (documentError) {
-          console.error(
-            'Failed to store the document in Supabase Filestore',
-            documentError
-          )
-          throw documentError
-        }
+        const documentPath = await uploadDocument(file)
         // Split document into chunks, store in supabase table and pinecone database
-        await storeDocumentVectors(documentData?.path, file.name)
+        await storeDocumentVectors(documentPath, file.name)
         // Update URL parameters with document ID
         const params = new URLSearchParams(
           searchParams as unknown as URLSearchParams
         )
-        params.set('document_id', documentData?.path)
+        params.set('document_id', documentPath)
         router.replace(`${pathname}?${params.toString()}`, {
           scroll: false,
         })

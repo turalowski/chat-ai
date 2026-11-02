@@ -27,7 +27,6 @@ export async function signup(email: string, password: string) {
   // type-casting here for convenience
   // in practice, you should validate your inputs
 
-  console.log(email, password);
   const response = await supabase.auth.signUp({
     email,
     password,
@@ -39,6 +38,12 @@ export async function signup(email: string, password: string) {
         response.error.name
       )}`
     );
+  }
+
+  // No confirmation email is needed when signup returns a session, as on local Supabase
+  if (response.data.session) {
+    revalidatePath('/');
+    redirect('/');
   }
 
   if (response.data && response.data.user) {

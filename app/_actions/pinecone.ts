@@ -5,86 +5,9 @@ import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
 import { OpenAIEmbeddings } from '@langchain/openai'
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf'
 import { Pinecone } from '@pinecone-database/pinecone'
-import { addDocumentToDatabse, updateUserDocuments } from './documents'
 
 /* Environment variables for Pinecone configuration */
-const PINECONE_NAME_SPACE = process.env.PINECONE_NAME_SPACE as string
 const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME as string
-
-/* Function to handle Delete request for document processing */
-export const flushPineconeIndex = async () => {
-  try {
-    const pinecone = new Pinecone({
-      apiKey: process.env.PINECONE_API_KEY as string,
-    })
-    const index =
-      pinecone.Index(PINECONE_INDEX_NAME) /* Change to your own index name */
-    await index.namespace(PINECONE_NAME_SPACE).deleteAll()
-    /* Returning the processed document chunks in JSON format */
-    return {
-      message: 'Success',
-      success: true,
-    }
-  } catch (error: any) {
-    if (error.name === 'PineconeNotFoundError') {
-      return { message: 'Success', success: true }
-    }
-    /* Handling errors during document processing */
-    console.error(`Deleting vectors error: ${error.message}`)
-    throw error
-  }
-}
-
-/* Function to handle Delete request for document processing */
-export const deleteVectorsByDocumentPath = async (path: string) => {
-  try {
-    // Initialize Pinecone client with API key
-    const pinecone = new Pinecone({
-      apiKey: process.env.PINECONE_API_KEY as string,
-    })
-    // Get index instance
-    const index =
-      pinecone.index(PINECONE_INDEX_NAME) /* Change to your own index name */
-
-    let paginationToken = undefined
-    // Iterate over paginated results until no more results are available
-    do {
-      // Retrieve vectors with prefix matching the document path
-      const results = await index.listPaginated({
-        prefix: `${path}#`,
-        paginationToken,
-      })
-      // Extract vector IDs
-      const vectors = results.vectors
-        ?.filter((vector) => vector !== undefined)
-        .map((vector) => vector?.id)
-      // Delete vectors if found
-
-      if (vectors?.length) {
-        await index.deleteMany(vectors)
-      }
-      // Move to next page if available
-      if (results.pagination?.next) {
-        paginationToken = results.pagination?.next
-      } else {
-        break
-      }
-    } while (paginationToken)
-    /* Returning the processed document chunks in JSON format */
-    return {
-      message: 'Success',
-      success: true,
-    }
-  } catch (error: any) {
-    // Handle PineconeNotFoundError
-    if (error.name === 'PineconeNotFoundError') {
-      return { message: 'Success', success: true }
-    }
-    /* Handling errors during document processing */
-    console.error(`Deleting vectors error: ${error.message}`)
-    throw error
-  }
-}
 
 /* Function to handle POST request for document processing */
 export async function storeDocumentVectors(
@@ -95,7 +18,7 @@ export async function storeDocumentVectors(
   try {
     // Create a Supabase client instance
     const client = createClient()
-    /* Get uploaded document from supabase storage */
+    /* Get uploaded document from supabase storage. RLS only allows the user's own files */
     const { data: documentAsBlob, error: documentError } = await client.storage
       .from('documents')
       .download(documentPath)
@@ -171,8 +94,12 @@ export async function storeDocumentVectors(
     const batchSize = 100
     await upsertInBatches(itemsToUpsert, batchSize)
     // Add document to database and update user documents
-    const documentId = await addDocumentToDatabse(documentPath, documentName)
-    await updateUserDocuments(documentId)
+    const { error: insertError } = await client
+      .from('documents')
+      .insert([{ path: documentPath, name: documentName }])
+    if (insertError) {
+      throw insertError
+    }
     // Return success message
     return {
       message: 'Success',
