@@ -33,7 +33,7 @@ export function Delete({
     }
     try {
       startTransition(async () => {
-        await deleteDocument(documentId, documentPath)
+        await deleteDocument(documentId)
         if (selectedDocumentPath === documentPath) {
           params.delete('document_id')
           router.replace(`${pathname}?${params.toString()}`, {

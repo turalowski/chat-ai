@@ -12,7 +12,7 @@ interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   group: {
     id: number
     name: string
-    docuemnt_ids: string[]
+    document_paths: string[]
     user_id: string
   }
 }

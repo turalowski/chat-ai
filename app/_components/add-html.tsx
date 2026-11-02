@@ -6,8 +6,7 @@ import { Label } from './ui/label';
 import { useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ReloadIcon, Link1Icon } from '@radix-ui/react-icons';
-import { createClient } from '../_utils/supabase/client';
-import { v4 } from 'uuid';
+import { uploadDocument } from '../_utils/upload-document';
 import { storeDocumentVectors } from '../_actions/pinecone';
 import { toast } from './ui/use-toast';
 import {
@@ -84,29 +83,17 @@ export function AddHtml({ className }: SidebarNavProps) {
           type: 'application/pdf',
         });
 
-        console.log('file', file)
-
         // Upload the PDF file
-        const client = createClient()
-        const { data: documentData, error: documentError } =
-          await client.storage.from('documents').upload(v4(), file)
-
-        if (documentError) {
-          console.error(
-            'Failed to store the document in Supabase Filestore',
-            documentError
-          )
-          throw documentError
-        }
+        const documentPath = await uploadDocument(file)
 
         // Store document vectors
-        await storeDocumentVectors(documentData?.path, file.name)
+        await storeDocumentVectors(documentPath, file.name)
 
         // Update URL parameters
         const params = new URLSearchParams(
           searchParams as unknown as URLSearchParams
         )
-        params.set('document_id', documentData?.path)
+        params.set('document_id', documentPath)
         router.replace(`${pathname}?${params.toString()}`, {
           scroll: false,
         })

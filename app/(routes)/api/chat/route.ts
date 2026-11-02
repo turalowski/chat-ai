@@ -1,72 +1,81 @@
 import type { Document } from 'langchain/document'
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
 import { PineconeStore } from '@langchain/pinecone'
+import { z } from 'zod'
+import { VoyageEmbeddings } from '@/app/_utils/embeddings'
 import { makeChain } from '@/app/_utils/makechain'
 import { pinecone } from '@/app/_utils/pinecone-client'
 import { createClient } from '@/app/_utils/supabase/server'
-import { VectorStore } from 'langchain/vectorstores/base'
 
 /* Retrieve Pinecone configurations from environment variables */
 const PINECONE_NAME_SPACE = process.env.PINECONE_NAME_SPACE as string
 const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME as string
 
+
+const bodySchema = z
+  .object({
+    question: z.string().trim().min(1).max(4000),
+    history: z.array(z.tuple([z.string(), z.string()])).max(500),
+    documentPath: z.string().max(200).nullish(),
+    groupId: z.string().max(64).nullish(),
+  })
+  .refine(({ documentPath, groupId }) => documentPath || groupId, {
+    message: 'Select a document or group first.',
+  })
+
 export async function POST(req: Request) {
-  /* Parse the request body to extract the question and history */
   try {
-    const { question, history, documentPath, groupId } = await req.json()
+    const supabase = createClient()
 
-    if (!documentPath && !groupId) {
-      throw new Error('Select a document or group first first.')
+    const body = bodySchema.safeParse(await req.json().catch(() => null))
+    if (!body.success) {
+      return Response.json(
+        { error: body.error.issues[0].message },
+        { status: 400 }
+      )
     }
+    const { question, history, documentPath, groupId } = body.data
 
-    /* Throw an error if the question field is missing */
-    if (!question) {
-      throw new Error('No question in the request.')
-    }
-    /* Sanitize the question by trimming and replacing newlines with spaces as recommended by OpenAI */
-    const sanitizedQuestion = question.trim().replaceAll('\n', ' ')
+    /* Sanitize the question by replacing newlines with spaces */
+    const sanitizedQuestion = question.replaceAll('\n', ' ')
     /* Initialize the Pinecone index with the given index name */
     const index = pinecone.Index(PINECONE_INDEX_NAME)
-    let documentPaths: string[] = []
 
-    if (documentPath) {
-      documentPaths = [documentPath]
-    }
+    let requestedPaths = documentPath ? [documentPath] : []
 
     if (groupId) {
-      // Create a client instance for Supabase
-      const supabase = createClient()
-      // Retrieve the currently authenticated user
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      const { data: group, error } = await supabase
+        .from('document_groups')
+        .select('document_paths')
+        .eq('id', groupId)
+        .returns<{ document_paths: string[] }[]>()
+        .maybeSingle()
 
-      // If a user is authenticated
-      if (user) {
-        // Query the 'user_documents' table to select documents where user_id matches the authenticated user's id
-        const response = supabase
-          .from('document_groups')
-          .select()
-          .eq('id', groupId)
-          .returns<
-            {
-              id: number
-              name: string
-              document_paths: string[]
-              user_id: string
-            }[]
-          >()
-        const { data, error } = await response
-        if (data && data.length > 0) {
-          documentPaths = data[0].document_paths
-        }
-      } else {
-        throw new Error('User id is missing')
+      if (error) {
+        throw error
       }
+      requestedPaths = group?.document_paths ?? []
     }
+
+    /* Pinecone has no RLS, so only search the paths that RLS lets this user see in the database */
+    const { data: visibleDocuments, error: documentsError } = await supabase
+      .from('documents')
+      .select('path')
+      .in('path', requestedPaths)
+      .returns<{ path: string }[]>()
+
+    if (documentsError) {
+      throw documentsError
+    }
+
+    const documentPaths = (visibleDocuments ?? []).map(({ path }) => path)
+
+    if (documentPaths.length === 0) {
+      return Response.json({ error: 'Document not found.' }, { status: 404 })
+    }
+
     /* Connect to the Pinecone vector store with the specified index, embedding model, and configurations */
     const vectorStore = await PineconeStore.fromExistingIndex(
-      new OpenAIEmbeddings({}),
+      new VoyageEmbeddings(),
       {
         pineconeIndex: index,
         textKey: 'text',
@@ -98,7 +107,7 @@ export async function POST(req: Request) {
     const chain = makeChain(retriever)
     /* Prepare the chat history for the chain by formatting the messages */
     const pastMessages = history
-      .map((message: [string, string]) => {
+      .map((message) => {
         return [`Human: ${message[0]}`, `Assistant: ${message[1]}`].join('\n')
       })
       .join('\n')
@@ -116,13 +125,9 @@ export async function POST(req: Request) {
         status: 200,
       }
     )
-  } catch (error: any) {
-    /* Catch and return any errors encountered during the process with a 500 status code */
-    return Response.json(
-      { error: error.message || 'Something went wrong' },
-      {
-        status: 500,
-      }
-    )
+  } catch (error) {
+    /* Log the details on the server: provider errors can contain internal information */
+    console.error('Chat error:', error)
+    return Response.json({ error: 'Something went wrong' }, { status: 500 })
   }
 }
